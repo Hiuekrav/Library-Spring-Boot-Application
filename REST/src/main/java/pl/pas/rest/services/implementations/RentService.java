@@ -4,20 +4,18 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.ClientSession;
 import lombok.Getter;
 import pl.pas.dto.create.RentCreateDTO;
-import pl.pas.rest.mgd.ClientMgd;
-import pl.pas.rest.mgd.ClientTypeMgd;
+import pl.pas.rest.mgd.users.ClientMgd;
+import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.mgd.RentMgd;
-import pl.pas.rest.mgd.VehicleMgd;
-import pl.pas.rest.model.Client;
-import pl.pas.rest.model.ClientType;
+import pl.pas.rest.mgd.CarMgd;
+import pl.pas.rest.model.users.User;
+
 import pl.pas.rest.model.Rent;
-import pl.pas.rest.model.Vehicle;
-import pl.pas.rest.repositories.implementations.ClientRepository;
-import pl.pas.rest.repositories.implementations.ClientTypeRepository;
+import pl.pas.rest.model.Car;
+import pl.pas.rest.repositories.implementations.CarRepository;
 import pl.pas.rest.repositories.implementations.RentRepository;
-import pl.pas.rest.repositories.implementations.VehicleRepository;
-import pl.pas.rest.repositories.interfaces.IClientRepository;
-import pl.pas.rest.repositories.interfaces.IClientTypeRepository;
+import pl.pas.rest.repositories.implementations.UserRepository;
+import pl.pas.rest.repositories.interfaces.ICarRepository;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.repositories.interfaces.IVehicleRepository;
 import pl.pas.rest.services.interfaces.IRentService;
@@ -50,11 +48,11 @@ public class RentService extends ObjectService implements IRentService {
         ClientSession clientSession  = super.getClient().startSession();
         try {
             clientSession.startTransaction();
-            ClientMgd foundClient = clientRepository.findById(createRentDTO.clientId());
-            VehicleMgd foundVehicle = vehicleRepository.findAnyVehicle(createRentDTO.vehicleId());
+            UserMgd foundClient = clientRepository.findById(createRentDTO.clientId());
+            CarMgd foundCar = carRepository.findById(createRentDTO.carId());
 
-            if (foundClient == null && foundVehicle == null) {
-                throw new RuntimeException("RentRepository: Client or Vehicle not found");
+            if (foundClient == null && foundCar == null) {
+                throw new RuntimeException("RentRepository: User or Vehicle not found");
             }
 
             if (createRentDTO.endTime().isBefore(LocalDateTime.now())) {
@@ -62,14 +60,7 @@ public class RentService extends ObjectService implements IRentService {
 
             }
 
-            ClientMgd clientMgd = clientRepository.findById(createRentDTO.clientId());
-            ClientTypeMgd clientTypeMgd = clientTypeRepository.findAnyClientType(clientMgd.getClientType());
-
-            if (Objects.equals(clientMgd.getActiveRents(), clientTypeMgd.getMaxVehicles())) {
-                throw new RuntimeException("RentRepository: Client has max vehicles");
-            }
-
-            foundClient = clientRepository.increaseActiveRents(createRentDTO.clientId(), 1);
+            UserMgd userMgd = clientRepository.findById(createRentDTO.clientId());
 
 
             foundVehicle = vehicleRepository.changeRentedStatus(foundVehicle.getId(), true);
@@ -77,8 +68,8 @@ public class RentService extends ObjectService implements IRentService {
             Rent rent = new Rent(
                     UUID.randomUUID(),
                     createRentDTO.endTime(),
-                    new Client(foundClient, new ClientType(clientTypeMgd)),
-                    new Vehicle(foundVehicle)
+                    new User(foundClient),
+                    new Car(foundCar)
             );
             RentMgd rentMgd = new RentMgd(rent, foundClient, foundVehicle);
             rentRepository.save(rentMgd);
@@ -99,12 +90,10 @@ public class RentService extends ObjectService implements IRentService {
     @Override
     public Rent findRentById(UUID id) {
         RentMgd rentMgd = rentRepository.findById(id);
-        VehicleMgd vehicleMgd = vehicleRepository.findAnyVehicle(rentMgd.getVehicle().getId());
-        ClientMgd clientMgd = clientRepository.findById(rentMgd.getClient().getId());
-        ClientTypeMgd clientTypeMgd = clientTypeRepository.findAnyClientType(clientMgd.getClientType());
-        ClientType clientType = new ClientType(clientTypeMgd);
+        CarMgd carMgd = carRepository.findById(rentMgd.getCarMgd().getId());
+        UserMgd userMgd = clientRepository.findById(rentMgd.getClient().getId());
 
-        return new Rent(rentMgd, new Client(clientMgd, clientType), new Vehicle(vehicleMgd));
+        return new Rent(rentMgd, new User(userMgd), new Car(carMgd));
 
     }
 
@@ -132,8 +121,8 @@ public class RentService extends ObjectService implements IRentService {
     public Rent updateRent(UUID id, LocalDateTime endTime) {
 
         RentMgd rentMgd = rentRepository.findActiveById(id);
-        VehicleMgd vehicleMgd = vehicleRepository.findById(rentMgd.getVehicle().getId());
-        ClientMgd clientMgd = clientRepository.findById(rentMgd.getClient().getId());
+        CarMgd carMgd = carRepository.findById(rentMgd.getCarMgd().getId());
+        UserMgd userMgd = clientRepository.findById(rentMgd.getClient().getId());
 
         Rent rent = findRentById(id);
 
@@ -143,7 +132,7 @@ public class RentService extends ObjectService implements IRentService {
             }
             rent.setEndTime(endTime);
             rent.recalculateRentCost();
-            rentRepository.save(new RentMgd(rent, clientMgd, vehicleMgd));
+            rentRepository.save(new RentMgd(rent, userMgd, carMgd));
             return rent;
 
         } catch (RuntimeException e) {

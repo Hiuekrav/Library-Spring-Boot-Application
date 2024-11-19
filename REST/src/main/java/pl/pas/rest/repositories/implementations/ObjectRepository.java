@@ -8,7 +8,9 @@ import com.mongodb.client.result.DeleteResult;
 import lombok.Getter;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
+import pl.pas.rest.exceptions.ApplicationDatabaseException;
 import pl.pas.rest.mgd.*;
+import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.repositories.interfaces.IObjectRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
@@ -33,7 +35,7 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         if (mgdClass.equals(VehicleMgd.class) || mgdClass.getSuperclass().equals(VehicleMgd.class) ) {
             this.collectionName = DatabaseConstants.VEHICLE_COLLECTION_NAME;
         }
-        else if (mgdClass.equals(ClientMgd.class) ) {
+        else if (mgdClass.equals(UserMgd.class) ) {
             this.collectionName = DatabaseConstants.CLIENT_COLLECTION_NAME;
         }
         else if (mgdClass.equals(ClientTypeMgd.class) || mgdClass.getSuperclass().equals(ClientTypeMgd.class) ) {
@@ -74,6 +76,7 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         return Updates.combine(updates);
     }
 
+    @Override
     public T findByIdOrNull(UUID id) {
         MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
         Bson filter = Filters.eq(DatabaseConstants.ID, id);
@@ -114,7 +117,7 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
             // ID not found - create operation
             List<Field> fieldList = new ArrayList<>();
             getAllFields(fieldList, object.getClass());
-            fieldList.removeIf( (field)-> Objects.equals(field.getAnnotation(BsonProperty.class).value(), DatabaseConstants.VEHICLE_RENTED));
+            fieldList.removeIf( (field)-> Objects.equals(field.getAnnotation(BsonProperty.class).value(), DatabaseConstants.CAR_RENTED));
             boolean nullFields = fieldList.stream().anyMatch(
                     (field) -> {
                         try {
@@ -149,7 +152,7 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
             DeleteResult result = collection.deleteOne(filter);
 
             if (result.getDeletedCount() == 0) {
-                throw new RuntimeException("Client with provided ID not found!");
+                throw new RuntimeException("User with provided ID not found!");
             }
         } catch (MongoCommandException e) {
             throw new RuntimeException("Error deleting client.", e);

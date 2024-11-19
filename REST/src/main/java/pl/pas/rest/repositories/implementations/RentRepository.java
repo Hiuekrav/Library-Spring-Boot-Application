@@ -9,11 +9,8 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import pl.pas.rest.mgd.BicycleMgd;
 import pl.pas.rest.mgd.CarMgd;
-import pl.pas.rest.mgd.MopedMgd;
 import pl.pas.rest.mgd.RentMgd;
-import pl.pas.rest.model.Moped;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 

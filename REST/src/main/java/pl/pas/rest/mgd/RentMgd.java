@@ -1,9 +1,11 @@
 package pl.pas.rest.mgd;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.model.Rent;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
@@ -12,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Getter @Setter
 public class RentMgd extends AbstractEntityMgd{
 
@@ -21,8 +24,8 @@ public class RentMgd extends AbstractEntityMgd{
      @BsonProperty(DatabaseConstants.RENT_END_TIME)
      private LocalDateTime endTime;
 
-     @BsonProperty(DatabaseConstants.CLIENT)
-     private ClientMgd client;
+     @BsonProperty(DatabaseConstants.RENT_CLIENT)
+     private UserMgd client;
 
      @BsonProperty(DatabaseConstants.VEHICLE)
      private VehicleMgd vehicle;
@@ -45,15 +48,7 @@ public class RentMgd extends AbstractEntityMgd{
         this.rentCost = ChronoUnit.HOURS.between(endTime, beginTime) * vehicle.getBasePrice();
     }
 
-
-    public RentMgd(Rent rent) {
-        super(rent.getId());
-        this.beginTime = rent.getBeginTime();
-        this.endTime = rent.getEndTime();
-        this.rentCost = rent.getRentCost();
-    }
-
-    public RentMgd(Rent rent, ClientMgd client, VehicleMgd vehicle) {
+    public RentMgd(Rent rent, UserMgd client, CarMgd carMgd) {
         super(rent.getId());
         this.beginTime = rent.getBeginTime();
         this.endTime = rent.getEndTime();

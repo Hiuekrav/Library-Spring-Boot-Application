@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import pl.pas.rest.mgd.RentMgd;
+import pl.pas.rest.model.users.User;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -14,12 +15,12 @@ public class Rent extends AbstractEntity {
 
     private LocalDateTime beginTime;
     private LocalDateTime endTime;
-    private Client client;
-    private Vehicle vehicle;
+    private User client;
+    private Car car;
     private Double rentCost;
     private boolean active;
 
-    public Rent(UUID id, LocalDateTime beginTime, LocalDateTime endTime, Client client, Vehicle vehicle, boolean active) {
+    public Rent(UUID id, LocalDateTime beginTime, LocalDateTime endTime, User client, Car car) {
         super(id);
         this.beginTime = beginTime;
         this.endTime = endTime;
@@ -33,7 +34,7 @@ public class Rent extends AbstractEntity {
         this.rentCost = ChronoUnit.HOURS.between(beginTime, endTime.plusHours(1)) * vehicle.getBasePrice() - client.getClientType().getDiscount();
     }
 
-    public Rent(RentMgd rentMgd, Client client, Vehicle vehicle) {
+    public Rent(RentMgd rentMgd, User client, Car car) {
         super(rentMgd.getId());
         this.beginTime = rentMgd.getBeginTime();
         this.endTime = rentMgd.getEndTime();
@@ -49,7 +50,7 @@ public class Rent extends AbstractEntity {
         this.rentCost = rentMgd.getRentCost();
     }
 
-    public Rent(UUID id, LocalDateTime endTime, Client client, Vehicle vehicle) {
+    public Rent(UUID id, LocalDateTime endTime, User client, Car car) {
         super(id);
         this.beginTime = LocalDateTime.now();
         this.endTime = endTime;

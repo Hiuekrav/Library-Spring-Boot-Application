@@ -9,7 +9,12 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
-import pl.pas.rest.mgd.*;
+import pl.pas.rest.mgd.CarMgd;
+import pl.pas.rest.mgd.users.AdminMgd;
+import pl.pas.rest.mgd.users.ClientMgd;
+import pl.pas.rest.mgd.users.MechanicMgd;
+import pl.pas.rest.mgd.users.UserMgd;
+import pl.pas.rest.model.users.User;
 import pl.pas.rest.services.interfaces.IObjectService;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
@@ -32,14 +37,11 @@ public abstract class ObjectService implements IObjectService {
 
         CodecRegistry pojoCodecRegistry = CodecRegistries.fromProviders(PojoCodecProvider.builder()
                 .automatic(true)
-                .register(VehicleMgd.class)
                 .register(CarMgd.class)
-                .register(MopedMgd.class)
-                .register(BicycleMgd.class)
-                .register(ClientTypeMgd.class)
-                .register(DefaultMgd.class)
-                .register(SilverMgd.class)
-                .register(GoldMgd.class)
+                .register(UserMgd.class)
+                .register(AdminMgd.class)
+                .register(MechanicMgd.class)
+                .register(ClientMgd.class)
                 .conventions(List.of(Conventions.ANNOTATION_CONVENTION)).build());
 
         MongoClientSettings settings = MongoClientSettings.builder()

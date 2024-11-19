@@ -9,18 +9,29 @@ import java.util.UUID;
 
 @SuperBuilder(toBuilder = true)
 @Getter @Setter
-public class Car extends MotorVehicle {
+public class Car extends AbstractEntity {
 
     public enum TransmissionType {
         MANUAL,
         AUTOMATIC
     }
 
+    private String plateNumber;
+    private Double basePrice;
+    private Integer engineDisplacement;
     private TransmissionType transmissionType;
+    private boolean rented;
+    private boolean archive;
 
-    public Car(UUID id, String plateNumber, Double basePrice, Integer engine_displacement, TransmissionType type) {
-        super(id, plateNumber, basePrice, engine_displacement);
-        this.transmissionType = type;
+    public Car(UUID id, String plateNumber, Double basePrice, Integer engineDisplacement,
+               TransmissionType transmissionType) {
+        super(id);
+        this.plateNumber = plateNumber;
+        this.basePrice = basePrice;
+        this.engineDisplacement = engineDisplacement;
+        this.transmissionType = transmissionType;
+        this.rented = false;
+        this.archive = false;
     }
 
     public Car(CarMgd carMgd) {
@@ -32,10 +43,4 @@ public class Car extends MotorVehicle {
         );
         this.transmissionType = carMgd.getTransmissionType();
     }
-
-
-
-
-
-
 }

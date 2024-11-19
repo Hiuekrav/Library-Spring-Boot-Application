@@ -1,6 +1,9 @@
 package pl.pas.rest.utils.consts;
 
 import pl.pas.rest.mgd.*;
+import pl.pas.rest.mgd.users.UserMgd;
+import pl.pas.rest.mgd.CarMgd;
+
 public class DatabaseConstants {
 
     //connection
@@ -13,18 +16,18 @@ public class DatabaseConstants {
 
 
     //ClientEmbeddedMgd
-    public static final String CLIENT= "client";
+    public static final String RENT_CLIENT = "client";
 
     // Vehicle
     public static final String BSON_DISCRIMINATOR_KEY = "_clazz";
-    public static final String VEHICLE= "vehicle";
-    public static final String VEHICLE_PLATE_NUMBER = "plateNumber";
-    public static final String VEHICLE_BASE_PRICE = "basePrice";
-    public static final String VEHICLE_ARCHIVE = "archive";
-    public static final String VEHICLE_RENTED = "rented";
+    public static final String VEHICLE_DISCRIMINATOR = "vehicle";
+    public static final String CAR_PLATE_NUMBER = "plateNumber";
+    public static final String CAR_BASE_PRICE = "basePrice";
+    public static final String CAR_ARCHIVE = "archive";
+    public static final String CAR_RENTED = "rented";
 
     // MotorVehicle
-    public static final String MOTOR_VEHICLE_ENGINE_DISPLACEMENT = "engineDisplacement";
+    public static final String CAR_ENGINE_DISPLACEMENT = "engineDisplacement";
 
     // Moped
     public static final String MOPED_DISCRIMINATOR = "moped";
@@ -54,7 +57,7 @@ public class DatabaseConstants {
     public static final String CLIENT_TYPE_MAX_VEHICLES = "max_vehicles";
 
 
-    // Client
+    // User
 
     public static final String CLIENT_FIRST_NAME = "first_name";
     public static final String CLIENT_LAST_NAME = "last_name";
@@ -86,10 +89,7 @@ public class DatabaseConstants {
     public static final String CLIENT_TYPE_COLLECTION_NAME = "client_types";
 
     //Collection types
-    public static final Class<ClientMgd> CLIENT_COLLECTION_TYPE = ClientMgd.class;
-    public static final Class<VehicleMgd> VEHICLE_COLLECTION_TYPE = VehicleMgd.class;
-    public static final Class<BicycleMgd> BICYCLE_COLLECTION_TYPE = BicycleMgd.class;
-    public static final Class<MopedMgd> MOPED_COLLECTION_TYPE = MopedMgd.class;
+    public static final Class<UserMgd> CLIENT_COLLECTION_TYPE = UserMgd.class;
     public static final Class<CarMgd> CAR_COLLECTION_TYPE = CarMgd.class;
     public static final Class<RentMgd> RENT_COLLECTION_TYPE = RentMgd.class;
     public static final Class<ClientTypeMgd> CLIENT_TYPE_COLLECTION_TYPE = ClientTypeMgd.class;
