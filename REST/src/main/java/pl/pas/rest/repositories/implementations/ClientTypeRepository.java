@@ -5,7 +5,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import pl.pas.rest.mgd.*;
+import pl.pas.rest.mgd.ClientTypeMgd;
+import pl.pas.rest.mgd.DefaultMgd;
+import pl.pas.rest.mgd.GoldMgd;
+import pl.pas.rest.mgd.SilverMgd;
 import pl.pas.rest.repositories.interfaces.IClientTypeRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
