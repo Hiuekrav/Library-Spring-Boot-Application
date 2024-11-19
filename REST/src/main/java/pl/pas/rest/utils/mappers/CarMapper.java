@@ -11,7 +11,8 @@ public class CarMapper {
                 car.getPlateNumber(),
                 car.getBasePrice(),
                 car.getEngineDisplacement(),
-                car.getTransmissionType().toString()
+                car.getTransmissionType().toString(),
+                car.isArchive()
         );
     }
 }

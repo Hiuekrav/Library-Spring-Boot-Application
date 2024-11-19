@@ -16,7 +16,7 @@ public class ClientController {
     @GetMapping("client")
     public ResponseEntity<?> getClient() {
 
-//        ClientCreateDTO createDTO = new ClientCreateDTO("Piotrek", "Leszcz",
+//        UserCreateDTO createDTO = new UserCreateDTO("Piotrek", "Leszcz",
 //                email, silver.getId(), "Wawa", "Kwiatowa", "15");
 //
 //        User newClient = clientService.createClient(createDTO);

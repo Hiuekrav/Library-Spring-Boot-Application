@@ -17,29 +17,26 @@ import pl.pas.rest.repositories.implementations.RentRepository;
 import pl.pas.rest.repositories.implementations.UserRepository;
 import pl.pas.rest.repositories.interfaces.ICarRepository;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
-import pl.pas.rest.repositories.interfaces.IVehicleRepository;
+import pl.pas.rest.repositories.interfaces.IUserRepository;
 import pl.pas.rest.services.interfaces.IRentService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 public class RentService extends ObjectService implements IRentService {
 
-    private final IClientRepository clientRepository;
+    private final IUserRepository<ClientMgd> clientRepository;
     private final IRentRepository rentRepository;
-    private final IVehicleRepository<VehicleMgd> vehicleRepository;
-    private final IClientTypeRepository clientTypeRepository;
+    private final ICarRepository carRepository;
 
 
     public RentService() {
         super();
         this.rentRepository = new RentRepository(super.getClient(), RentMgd.class);
-        this.vehicleRepository = new VehicleRepository<>(super.getClient(), VehicleMgd.class);
-        this.clientRepository = new ClientRepository(super.getClient(), ClientMgd.class);
-        this.clientTypeRepository = new ClientTypeRepository(super.getClient(), ClientTypeMgd.class);
+        this.clientRepository = new UserRepository<>(super.getClient(), ClientMgd.class);
+        this.carRepository = new CarRepository(super.getClient());
     }
 
 
@@ -63,7 +60,7 @@ public class RentService extends ObjectService implements IRentService {
             UserMgd userMgd = clientRepository.findById(createRentDTO.clientId());
 
 
-            foundVehicle = vehicleRepository.changeRentedStatus(foundVehicle.getId(), true);
+            foundCar = carRepository.changeRentedStatus(foundCar.getId(), true);
 
             Rent rent = new Rent(
                     UUID.randomUUID(),
@@ -71,7 +68,7 @@ public class RentService extends ObjectService implements IRentService {
                     new User(foundClient),
                     new Car(foundCar)
             );
-            RentMgd rentMgd = new RentMgd(rent, foundClient, foundVehicle);
+            RentMgd rentMgd = new RentMgd(rent, foundClient, foundCar);
             rentRepository.save(rentMgd);
             return rent;
         }
@@ -147,8 +144,7 @@ public class RentService extends ObjectService implements IRentService {
         try {
             clientSession.startTransaction();
             RentMgd rent = rentRepository.findActiveById(id);
-            vehicleRepository.changeRentedStatus(rent.getVehicle().getId(), false);
-            clientRepository.increaseActiveRents(rent.getClient().getId(), -1);
+            carRepository.changeRentedStatus(rent.getCarMgd().getId(), false);
             rentRepository.moveRentToArchived(id);
             clientSession.commitTransaction();
         } catch (RuntimeException e) {

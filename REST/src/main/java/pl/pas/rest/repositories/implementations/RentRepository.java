@@ -73,8 +73,8 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
                 .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, RentMgd.class);
 
         MongoCollection<Document> vehicleMgdMongoCollection = super.getDatabase()
-                .getCollection(DatabaseConstants.VEHICLE_COLLECTION_NAME);
-        Bson filter = Filters.eq(DatabaseConstants.ID, rentMgd.getVehicle().getId());
+                .getCollection(DatabaseConstants.CAR_COLLECTION_NAME);
+        Bson filter = Filters.eq(DatabaseConstants.ID, rentMgd.getCarMgd().getId());
         Document vehicleDoc = vehicleMgdMongoCollection.find(filter).first();
         if (vehicleDoc == null) {
             clientSession.close();
@@ -82,17 +82,9 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
         }
         String discriminatorValue = vehicleDoc.getString(DatabaseConstants.BSON_DISCRIMINATOR_KEY);
 
-        Class<?> mgdClass = VehicleRepository.getDiscriminatorForString(discriminatorValue);
 
-        if (mgdClass.equals(CarMgd.class)) {
-            rentMgd.setVehicle(new CarMgd(vehicleDoc));
-        }
-        else if (mgdClass.equals(BicycleMgd.class)) {
-            rentMgd.setVehicle(new BicycleMgd(vehicleDoc));
-        }
-        else if (mgdClass.equals(Moped.class)) {
-            rentMgd.setVehicle(new MopedMgd(vehicleDoc));
-        }
+        rentMgd.setCarMgd(new CarMgd(vehicleDoc));
+
 
         Bson rentFilter = Filters.eq(DatabaseConstants.ID, rentMgd.getId());
 

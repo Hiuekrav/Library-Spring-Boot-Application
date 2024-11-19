@@ -1,7 +1,7 @@
 package pl.pas.rest.controllers.implementations;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pas.dto.create.CarCreateDTO;
@@ -19,8 +19,8 @@ public class CarController implements ICarController {
 
     private final ICarService carService;
 
-    @GetMapping(value = "car/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCar(@PathVariable("id") UUID id) {
+    @Override
+    public ResponseEntity<?> findById(UUID id) {
         Car car = carService.findCarById(id);
         CarOutputDTO outputDTO = CarMapper.carToCarOutputDTO(car);
         return ResponseEntity.ok().body(outputDTO);
@@ -32,5 +32,6 @@ public class CarController implements ICarController {
         CarOutputDTO outputDTO = CarMapper.carToCarOutputDTO(car);
         return ResponseEntity.ok().body(outputDTO);
     }
+
 
 }

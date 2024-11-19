@@ -25,13 +25,13 @@ public class Rent extends AbstractEntity {
         this.beginTime = beginTime;
         this.endTime = endTime;
         this.client = client;
-        this.vehicle = vehicle;
-        this.active = active;
-        this.rentCost = ChronoUnit.HOURS.between(beginTime, endTime.plusHours(1)) * vehicle.getBasePrice() - client.getClientType().getDiscount();
+        this.car = car;
+        this.active = !beginTime.isAfter(LocalDateTime.now());
+        this.rentCost = ChronoUnit.HOURS.between(beginTime, endTime.plusHours(1)) * car.getBasePrice();
     }
 
     public void recalculateRentCost() {
-        this.rentCost = ChronoUnit.HOURS.between(beginTime, endTime.plusHours(1)) * vehicle.getBasePrice() - client.getClientType().getDiscount();
+        this.rentCost = ChronoUnit.HOURS.between(beginTime, endTime.plusHours(1)) * car.getBasePrice();
     }
 
     public Rent(RentMgd rentMgd, User client, Car car) {
@@ -40,7 +40,7 @@ public class Rent extends AbstractEntity {
         this.endTime = rentMgd.getEndTime();
         this.rentCost = rentMgd.getRentCost();
         this.client = client;
-        this.vehicle = vehicle;
+        this.car = car;
     }
 
     public Rent(RentMgd rentMgd) {
@@ -55,9 +55,9 @@ public class Rent extends AbstractEntity {
         this.beginTime = LocalDateTime.now();
         this.endTime = endTime;
         this.client = client;
-        this.vehicle = vehicle;
+        this.car = car;
         this.active = true;
-        this.rentCost = ChronoUnit.HOURS.between(beginTime, endTime.plusHours(1)) * vehicle.getBasePrice() - client.getClientType().getDiscount();
+        this.rentCost = ChronoUnit.HOURS.between(beginTime, endTime.plusHours(1)) * car.getBasePrice();
     }
 
 }

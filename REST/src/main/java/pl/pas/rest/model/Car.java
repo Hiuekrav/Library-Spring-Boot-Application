@@ -35,12 +35,12 @@ public class Car extends AbstractEntity {
     }
 
     public Car(CarMgd carMgd) {
-        super(
-            carMgd.getId(),
-            carMgd.getPlateNumber(),
-            carMgd.getBasePrice(),
-            carMgd.getEngineDisplacement()
-        );
+        super(carMgd.getId());
+        this.plateNumber = carMgd.getPlateNumber();
+        this.basePrice = carMgd.getBasePrice();
+        this.engineDisplacement = carMgd.getEngineDisplacement();
         this.transmissionType = carMgd.getTransmissionType();
+        this.rented = carMgd.getRented() == 1;
+        this.archive = carMgd.isArchive();
     }
 }

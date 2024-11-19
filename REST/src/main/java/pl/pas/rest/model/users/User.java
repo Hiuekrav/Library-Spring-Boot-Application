@@ -14,7 +14,7 @@ public class User extends AbstractEntity {
     private String firstName;
     private String lastName;
     private String email;
-    private ClientType clientType;
+    private String password;
     private String cityName;
     private String streetName;
     private String streetNumber;
@@ -26,6 +26,7 @@ public class User extends AbstractEntity {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.password = password;
         this.cityName = cityName;
         this.streetName = streetName;
         this.streetNumber = streetNumber;

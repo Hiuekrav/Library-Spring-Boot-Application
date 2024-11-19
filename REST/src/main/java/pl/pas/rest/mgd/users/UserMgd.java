@@ -21,21 +21,17 @@ import java.util.UUID;
 @BsonDiscriminator(key = DatabaseConstants.BSON_DISCRIMINATOR_KEY , value = DatabaseConstants.USER_DISCRIMINATOR)
 public class UserMgd extends AbstractEntityMgd {
 
-    @BsonProperty(DatabaseConstants.CLIENT_FIRST_NAME)
+    @BsonProperty(DatabaseConstants.USER_FIRST_NAME)
     private String firstName;
 
-    @BsonProperty(DatabaseConstants.CLIENT_LAST_NAME)
+    @BsonProperty(DatabaseConstants.USER_LAST_NAME)
     private String lastName;
 
-    @BsonProperty(DatabaseConstants.CLIENT_EMAIL)
+    @BsonProperty(DatabaseConstants.USER_EMAIL)
     private String email;
 
-    @BsonProperty(DatabaseConstants.CLIENT_CLIENT_TYPE_ID)
-    private UUID clientType;
-
-    // liczba aktywnych wypozyczen, aby nie mozna bylo przekroczyc limitu dla typu klienta
-    @BsonProperty(DatabaseConstants.CLIENT_ACTIVE_RENTS)
-    private Integer activeRents;
+    @BsonProperty(DatabaseConstants.USER_PASSWORD)
+    private String password;
 
     @BsonProperty(DatabaseConstants.CLIENT_CITY_NAME)
     private String cityName;
@@ -52,11 +48,10 @@ public class UserMgd extends AbstractEntityMgd {
     @BsonCreator
     public UserMgd(
             @BsonProperty(DatabaseConstants.ID) UUID id,
-            @BsonProperty(DatabaseConstants.CLIENT_FIRST_NAME) String firstName,
-            @BsonProperty(DatabaseConstants.CLIENT_LAST_NAME) String lastName,
-            @BsonProperty(DatabaseConstants.CLIENT_EMAIL) String email,
-            @BsonProperty(DatabaseConstants.CLIENT_CLIENT_TYPE_ID) UUID type_id,
-            @BsonProperty(DatabaseConstants.CLIENT_ACTIVE_RENTS) Integer activeRents,
+            @BsonProperty(DatabaseConstants.USER_FIRST_NAME) String firstName,
+            @BsonProperty(DatabaseConstants.USER_LAST_NAME) String lastName,
+            @BsonProperty(DatabaseConstants.USER_EMAIL) String email,
+            @BsonProperty(DatabaseConstants.USER_PASSWORD) String password,
             @BsonProperty(DatabaseConstants.CLIENT_CITY_NAME) String cityName,
             @BsonProperty(DatabaseConstants.CLIENT_STREET_NAME) String streetName,
             @BsonProperty(DatabaseConstants.CLIENT_STREET_NUMBER) String streetNumber) {
@@ -82,6 +77,22 @@ public class UserMgd extends AbstractEntityMgd {
         this.streetNumber = user.getStreetNumber();
         this.active = user.isActive();
     }
+
+    public UserMgd(Document document) {
+        super(
+                document.get(DatabaseConstants.ID, UUID.class)
+        );
+        this.firstName = document.getString(DatabaseConstants.USER_FIRST_NAME);
+        this.lastName = document.getString(DatabaseConstants.USER_LAST_NAME);
+        this.email = document.getString(DatabaseConstants.USER_EMAIL);
+        this.password = document.getString(DatabaseConstants.USER_PASSWORD);
+        this.cityName = document.getString(DatabaseConstants.CLIENT_CITY_NAME);
+        this.streetName = document.getString(DatabaseConstants.CLIENT_STREET_NAME);
+        this.streetNumber = document.getString(DatabaseConstants.CLIENT_STREET_NUMBER);
+        this.active = document.getBoolean(DatabaseConstants.USER_ACTIVE);
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

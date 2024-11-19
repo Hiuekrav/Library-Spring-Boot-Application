@@ -1,9 +1,11 @@
 package pl.pas.rest.services.implementations;
 
+import com.mongodb.MongoWriteException;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 import pl.pas.dto.create.CarCreateDTO;
 import pl.pas.dto.update.CarUpdateDTO;
+import pl.pas.rest.exceptions.vehicle.VehiclePlateNumberAlreadyExistException;
 import pl.pas.rest.mgd.CarMgd;
 import pl.pas.rest.mgd.RentMgd;
 import pl.pas.rest.model.Car;
@@ -25,20 +27,28 @@ public class CarService extends ObjectService implements ICarService {
 
     public CarService() {
         super();
-        this.carRepository = new CarRepository(super.getClient(), CarMgd.class);
+        this.carRepository = new CarRepository(super.getClient());
         this.rentRepository = new RentRepository(super.getClient(), RentMgd.class);
     }
 
     @Override
     public Car createCar(CarCreateDTO carCreateDTO) {
-        Car car =  Car.builder().
+        CarMgd car =  CarMgd.builder().
                 id(UUID.randomUUID()).
-                plateNumber(carCreateDTO.getPlateNumber()).
-                basePrice(carCreateDTO.getBasePrice()).
-                engineDisplacement(carCreateDTO.getEngineDisplacement()).
-                transmissionType(Car.TransmissionType.valueOf(carCreateDTO.getTransmissionType()))
+                plateNumber(carCreateDTO.plateNumber()).
+                basePrice(carCreateDTO.basePrice()).
+                engineDisplacement(carCreateDTO.engineDisplacement()).
+                transmissionType(Car.TransmissionType.valueOf(carCreateDTO.transmissionType()))
                 .build();
-        return new Car(carRepository.save(new CarMgd(car)));
+
+        CarMgd createdCar;
+        try {
+            createdCar = carRepository.save(car);
+        }
+        catch (MongoWriteException e) {
+            throw new VehiclePlateNumberAlreadyExistException();
+        }
+        return new Car(createdCar);
     }
 
     @Override
@@ -59,15 +69,15 @@ public class CarService extends ObjectService implements ICarService {
     @Override
     public Car updateCar(CarUpdateDTO updateDTO) {
         CarMgd modifiedCar = CarMgd.builder()
-                .id(updateDTO.getId())
-                .plateNumber(updateDTO.getPlateNumber())
-                .basePrice(updateDTO.getBasePrice())
+                .id(updateDTO.id())
+                .plateNumber(updateDTO.plateNumber())
+                .basePrice(updateDTO.basePrice())
                 .transmissionType(
-                        updateDTO.getTransmissionType() == null ? null : Car.TransmissionType.valueOf(updateDTO.getTransmissionType())
+                        updateDTO.transmissionType() == null ? null : Car.TransmissionType.valueOf(updateDTO.transmissionType())
                 )
-                .engineDisplacement(updateDTO.getEngineDisplacement())
+                .engineDisplacement(updateDTO.engineDisplacement())
                 .build();
-        carRepository.findById(updateDTO.getId());
+        carRepository.findById(updateDTO.id());
         return new Car(carRepository.save(modifiedCar));
     }
 

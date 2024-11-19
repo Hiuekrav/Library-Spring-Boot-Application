@@ -14,7 +14,6 @@ public class DatabaseConstants {
 
     public static final String DATABASE_NAME = "rentacar";
 
-
     //ClientEmbeddedMgd
     public static final String RENT_CLIENT = "client";
 
@@ -59,10 +58,11 @@ public class DatabaseConstants {
 
     // User
 
-    public static final String CLIENT_FIRST_NAME = "first_name";
-    public static final String CLIENT_LAST_NAME = "last_name";
-    public static final String CLIENT_EMAIL = "email";
-    public static final String CLIENT_ACTIVE_RENTS = "active_rents";
+    public static final String USER_FIRST_NAME = "first_name";
+    public static final String USER_LAST_NAME = "last_name";
+    public static final String USER_EMAIL = "email";
+    public static final String USER_ACTIVE_RENTS = "active_rents";
+    public static final String USER_PASSWORD = "password";
 
     public static final String CLIENT_CITY_NAME = "city_name";
     public static final String CLIENT_STREET_NAME = "street_name";
@@ -78,22 +78,32 @@ public class DatabaseConstants {
 
     public static final String RENT_RENT_COST = "rent_cost";
     public static final String RENT_ACTIVE = "active";
+    public static final String RENT_CAR = "car";
+
     public static final String RENT_CLIENT_ID = "client._id";
     public static final String RENT_VEHICLE_ID = "vehicle._id";
 
+    // Users
+
+    public static final String USER_ACTIVE = "active";
+
+    public static final String USER_DISCRIMINATOR = "user";
+    public static final String CLIENT_DISCRIMINATOR = "client";
+    public static final String MECHANIC_DISCRIMINATOR = "mechanic";
+    public static final String ADMIN_DISCRIMINATOR = "admin";
+
     //Collection names
     public static final String CLIENT_COLLECTION_NAME = "clients";
-    public static final String VEHICLE_COLLECTION_NAME = "vehicles";
+    public static final String CAR_COLLECTION_NAME = "cars";
     public static final String RENT_ACTIVE_COLLECTION_NAME = "active_rents";
     public static final String RENT_ARCHIVE_COLLECTION_NAME = "archive_rents";
     public static final String CLIENT_TYPE_COLLECTION_NAME = "client_types";
+    public static final String USER_COLLECTION_NAME = "users";
 
     //Collection types
     public static final Class<UserMgd> CLIENT_COLLECTION_TYPE = UserMgd.class;
     public static final Class<CarMgd> CAR_COLLECTION_TYPE = CarMgd.class;
     public static final Class<RentMgd> RENT_COLLECTION_TYPE = RentMgd.class;
-    public static final Class<ClientTypeMgd> CLIENT_TYPE_COLLECTION_TYPE = ClientTypeMgd.class;
-
-
+    public static final Class<UserMgd> USER_TYPE_COLLECTION_TYPE = UserMgd.class;
 
 }

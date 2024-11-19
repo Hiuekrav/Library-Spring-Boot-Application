@@ -32,14 +32,11 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         this.client = client;
         this.mgdClass = mgdClass;
         this.database = client.getDatabase(DatabaseConstants.DATABASE_NAME);
-        if (mgdClass.equals(VehicleMgd.class) || mgdClass.getSuperclass().equals(VehicleMgd.class) ) {
-            this.collectionName = DatabaseConstants.VEHICLE_COLLECTION_NAME;
+        if (mgdClass.equals(CarMgd.class) ) {
+            this.collectionName = DatabaseConstants.CAR_COLLECTION_NAME;
         }
         else if (mgdClass.equals(UserMgd.class) ) {
             this.collectionName = DatabaseConstants.CLIENT_COLLECTION_NAME;
-        }
-        else if (mgdClass.equals(ClientTypeMgd.class) || mgdClass.getSuperclass().equals(ClientTypeMgd.class) ) {
-            this.collectionName = DatabaseConstants.CLIENT_TYPE_COLLECTION_NAME;
         }
         else if (mgdClass.equals(RentMgd.class) ) {
            this.collectionName = DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME;
@@ -106,7 +103,7 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
             return collection.find().into(new ArrayList<>());
         } catch (MongoCommandException e) {
             clientSession.close();
-            throw new RuntimeException("VehicleRepository:\n Class: " + getMgdClass().getSimpleName() + "\n, findAll: MongoCommandException!");
+            throw new ApplicationDatabaseException(e.getMessage());
         }
     }
 
