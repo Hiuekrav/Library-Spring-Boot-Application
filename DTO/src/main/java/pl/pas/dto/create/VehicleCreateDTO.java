@@ -2,14 +2,22 @@ package pl.pas.dto.create;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
+@NoArgsConstructor
 @Getter @Setter
 public class VehicleCreateDTO {
 
-    private final String plateNumber;
+    private String plateNumber;
 
-    private final Double basePrice;
+    private Double basePrice;
+
+    public VehicleCreateDTO(String plateNumber, Double basePrice) {
+        this.plateNumber = plateNumber;
+        this.basePrice = basePrice;
+    }
+
+
 
 }

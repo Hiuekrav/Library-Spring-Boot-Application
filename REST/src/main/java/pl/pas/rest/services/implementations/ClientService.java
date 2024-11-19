@@ -1,6 +1,7 @@
 package pl.pas.rest.services.implementations;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import pl.pas.dto.create.ClientCreateDTO;
 import pl.pas.dto.update.ClientUpdateDTO;
 import pl.pas.rest.mgd.ClientMgd;
@@ -22,6 +23,7 @@ import pl.pas.rest.services.interfaces.IClientService;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 @RequiredArgsConstructor
 public class ClientService extends ObjectService implements IClientService {
 

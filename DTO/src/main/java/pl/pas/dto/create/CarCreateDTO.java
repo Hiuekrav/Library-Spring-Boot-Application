@@ -1,12 +1,14 @@
 package pl.pas.dto.create;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Getter @Setter
 public class CarCreateDTO extends MopedCreateDTO {
 
-    private final String transmissionType;
+    private String transmissionType;
 
     public CarCreateDTO(String plateNumber,
                         Double basePrice,

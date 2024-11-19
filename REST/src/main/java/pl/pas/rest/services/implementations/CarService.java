@@ -1,8 +1,9 @@
 package pl.pas.rest.services.implementations;
 
-import pl.pas.dto.create.CarCreateDTO;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import pl.pas.dto.create.CarCreateDTO;
+import pl.pas.dto.update.CarUpdateDTO;
 import pl.pas.rest.mgd.CarMgd;
 import pl.pas.rest.mgd.RentMgd;
 import pl.pas.rest.model.Car;
@@ -11,12 +12,11 @@ import pl.pas.rest.repositories.implementations.RentRepository;
 import pl.pas.rest.repositories.interfaces.ICarRepository;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.services.interfaces.ICarService;
-import pl.pas.dto.update.CarUpdateDTO;
 
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
+@Service
 @Getter
 public class CarService extends ObjectService implements ICarService {
 
