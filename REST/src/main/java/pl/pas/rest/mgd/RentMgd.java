@@ -10,8 +10,6 @@ import pl.pas.rest.model.Rent;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
@@ -24,36 +22,31 @@ public class RentMgd extends AbstractEntityMgd{
      @BsonProperty(DatabaseConstants.RENT_END_TIME)
      private LocalDateTime endTime;
 
-     @BsonProperty(DatabaseConstants.RENT_CLIENT)
-     private UserMgd client;
+     @BsonProperty(DatabaseConstants.RENT_READER)
+     private UserMgd reader;
 
-     @BsonProperty(DatabaseConstants.RENT_CAR)
-     private CarMgd carMgd;
-
-     @BsonProperty(DatabaseConstants.RENT_RENT_COST)
-     private Double rentCost;
+     @BsonProperty(DatabaseConstants.RENT_BOOK)
+     private BookMgd bookMgd;
 
     @BsonCreator
     public RentMgd(
             @BsonProperty(DatabaseConstants.ID) UUID id,
             @BsonProperty(DatabaseConstants.RENT_BEGIN_TIME) LocalDateTime beginTime,
             @BsonProperty(DatabaseConstants.RENT_END_TIME) LocalDateTime endTime,
-            @BsonProperty(DatabaseConstants.RENT_CLIENT) UserMgd client,
-            @BsonProperty(DatabaseConstants.RENT_CAR) CarMgd carMgd) {
+            @BsonProperty(DatabaseConstants.RENT_READER) UserMgd reader,
+            @BsonProperty(DatabaseConstants.RENT_BOOK) BookMgd bookMgd) {
         super(id);
         this.beginTime = beginTime;
         this.endTime = endTime;
-        this.client = client;
-        this.carMgd = carMgd;
-        this.rentCost = ChronoUnit.HOURS.between(endTime, beginTime) * carMgd.getBasePrice();
+        this.reader = reader;
+        this.bookMgd = bookMgd;
     }
 
-    public RentMgd(Rent rent, UserMgd client, CarMgd carMgd) {
+    public RentMgd(Rent rent, UserMgd reader, BookMgd bookMgd) {
         super(rent.getId());
         this.beginTime = rent.getBeginTime();
         this.endTime = rent.getEndTime();
-        this.rentCost = rent.getRentCost();
-        this.client = client;
-        this.carMgd = carMgd;
+        this.reader = reader;
+        this.bookMgd = bookMgd;
     }
 }

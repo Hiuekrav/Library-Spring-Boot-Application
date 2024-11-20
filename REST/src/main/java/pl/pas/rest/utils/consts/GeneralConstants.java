@@ -1,5 +1,5 @@
 package pl.pas.rest.utils.consts;
 
 public class GeneralConstants {
-    public static final String APPLICATION_CONTEXT = "rentacar";
+    public static final String APPLICATION_CONTEXT = "library";
 }

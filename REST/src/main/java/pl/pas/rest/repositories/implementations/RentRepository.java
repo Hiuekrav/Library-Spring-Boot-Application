@@ -9,7 +9,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import pl.pas.rest.mgd.CarMgd;
+import pl.pas.rest.mgd.BookMgd;
 import pl.pas.rest.mgd.RentMgd;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 
 public class RentRepository extends ObjectRepository<RentMgd> implements IRentRepository {
 
-    public RentRepository(MongoClient client, Class<RentMgd> mgdClass) {
-        super(client, mgdClass);
+    public RentRepository(MongoClient client) {
+        super(client, RentMgd.class);
 
         boolean collectionActiveExist = getDatabase().listCollectionNames()
                 .into(new ArrayList<>()).contains(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME);
@@ -72,18 +72,16 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, RentMgd.class);
 
-        MongoCollection<Document> vehicleMgdMongoCollection = super.getDatabase()
-                .getCollection(DatabaseConstants.CAR_COLLECTION_NAME);
-        Bson filter = Filters.eq(DatabaseConstants.ID, rentMgd.getCarMgd().getId());
-        Document vehicleDoc = vehicleMgdMongoCollection.find(filter).first();
-        if (vehicleDoc == null) {
+        MongoCollection<Document> bookMgdMongoCollection = super.getDatabase()
+                .getCollection(DatabaseConstants.BOOK_COLLECTION_NAME);
+        Bson filter = Filters.eq(DatabaseConstants.ID, rentMgd.getBookMgd().getId());
+        Document bookDoc = bookMgdMongoCollection.find(filter).first();
+        if (bookDoc == null) {
             clientSession.close();
-            throw new RuntimeException("Vehicle not found");
+            throw new RuntimeException("book not found");
         }
-        String discriminatorValue = vehicleDoc.getString(DatabaseConstants.BSON_DISCRIMINATOR_KEY);
 
-
-        rentMgd.setCarMgd(new CarMgd(vehicleDoc));
+        rentMgd.setBookMgd(new BookMgd(bookDoc));
 
 
         Bson rentFilter = Filters.eq(DatabaseConstants.ID, rentMgd.getId());
@@ -130,49 +128,49 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
     }
 
     @Override
-    public List<RentMgd> findAllActiveByClientId(UUID clientId) {
+    public List<RentMgd> findAllActiveByReaderId(UUID clientId) {
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
 
-        Bson filter = Filters.eq(DatabaseConstants.RENT_CLIENT_ID, clientId);
+        Bson filter = Filters.eq(DatabaseConstants.RENT_READER_ID, clientId);
         return rentMgdMongoCollection.find(filter).into(new ArrayList<>());
     }
 
     @Override
-    public List<RentMgd> findAllArchivedByClientId(UUID clientId) {
+    public List<RentMgd> findAllArchivedByReaderId(UUID clientId) {
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ARCHIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
-        Bson filter = Filters.eq(DatabaseConstants.RENT_CLIENT_ID, clientId);
+        Bson filter = Filters.eq(DatabaseConstants.RENT_READER_ID, clientId);
         return rentMgdMongoCollection.find(filter).into(new ArrayList<>());
     }
 
     @Override
-    public List<RentMgd> findAllByClientId(UUID clientId) {
-        return Stream.concat(findAllActiveByClientId(clientId).stream(),
-                            findAllArchivedByClientId(clientId).stream()).toList();
+    public List<RentMgd> findAllByReaderId(UUID clientId) {
+        return Stream.concat(findAllActiveByReaderId(clientId).stream(),
+                            findAllArchivedByReaderId(clientId).stream()).toList();
     }
 
     @Override
-    public List<RentMgd> findAllArchivedByVehicleId(UUID vehicleId) {
+    public List<RentMgd> findAllArchivedByBookId(UUID bookId) {
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ARCHIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
-        Bson filter = Filters.eq(DatabaseConstants.RENT_VEHICLE_ID, vehicleId);
+        Bson filter = Filters.eq(DatabaseConstants.RENT_BOOK_ID, bookId);
         return rentMgdMongoCollection.find(filter).into(new ArrayList<>());
     }
 
     @Override
-    public List<RentMgd> findAllActiveByVehicleId(UUID vehicleId) {
+    public List<RentMgd> findAllActiveByBookId(UUID bookId) {
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
 
-        Bson filter = Filters.eq(DatabaseConstants.RENT_VEHICLE_ID, vehicleId);
+        Bson filter = Filters.eq(DatabaseConstants.RENT_BOOK_ID, bookId);
         return rentMgdMongoCollection.find(filter).into(new ArrayList<>());
     }
 
     @Override
-    public List<RentMgd> findAllByVehicleId(UUID vehicleId) {
-        return Stream.concat(findAllActiveByVehicleId(vehicleId).stream(),
-                            findAllArchivedByVehicleId(vehicleId).stream()).toList();
+    public List<RentMgd> findAllByBookId(UUID bookId) {
+        return Stream.concat(findAllArchivedByBookId(bookId).stream(),
+                            findAllArchivedByBookId(bookId).stream()).toList();
     }
 
 }

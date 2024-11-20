@@ -12,15 +12,17 @@ import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
+import pl.pas.rest.exceptions.user.UserNotFoundException;
 import pl.pas.rest.mgd.users.AdminMgd;
-import pl.pas.rest.mgd.users.ClientMgd;
-import pl.pas.rest.mgd.users.MechanicMgd;
+import pl.pas.rest.mgd.users.ReaderMgd;
+import pl.pas.rest.mgd.users.LibrarianMgd;
 import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.repositories.interfaces.IUserRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
 import java.util.ArrayList;
 import java.util.UUID;
+
 
 public class UserRepository<T extends UserMgd> extends ObjectRepository<T> implements IUserRepository<T> {
 
@@ -41,13 +43,13 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
                                     {
                                         $jsonSchema: {
                                             "bsonType": "object",
-                                            "required": ["_id", "first_name", "last_name", "email", "password",
-                                                         "city_name", "street_name", "street_number", "active"]
+                                            "required": ["_id", "firstName", "lastName", "email", "password",
+                                                         "cityName", "streetName", "streetNumber", "active"]
                                             "properties": {
-                                                    "first_name": {
+                                                    "firstName": {
                                                         "bsonType": "string"
                                                     },
-                                                    "last_name": {
+                                                    "lastName": {
                                                         "bsonType": "string"
                                                     },
                                                     "email": {
@@ -56,13 +58,13 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
                                                     "password": {
                                                         "bsonType": "string"
                                                     }
-                                                    "city_name": {
+                                                    "cityName": {
                                                         "bsonType": "string"
                                                     },
-                                                    "street_name": {
+                                                    "streetName": {
                                                         "bsonType": "string"
                                                     },
-                                                    "street_number": {
+                                                    "streetNumber": {
                                                         "bsonType": "string"
                                                      },
                                                      "active": {
@@ -90,11 +92,11 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
         if (mgdClass.equals(AdminMgd.class)) {
             return DatabaseConstants.ADMIN_DISCRIMINATOR;
         }
-        else if (mgdClass.equals(MechanicMgd.class)) {
-            return DatabaseConstants.MECHANIC_DISCRIMINATOR;
+        else if (mgdClass.equals(LibrarianMgd.class)) {
+            return DatabaseConstants.LIBRARIAN_DISCRIMINATOR;
         }
-        else if (mgdClass.equals(ClientMgd.class)) {
-            return DatabaseConstants.CLIENT_DISCRIMINATOR;
+        else if (mgdClass.equals(ReaderMgd.class)) {
+            return DatabaseConstants.READER_DISCRIMINATOR;
         }
         return DatabaseConstants.USER_DISCRIMINATOR;
     }
@@ -102,8 +104,8 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
     public static Class<?> getDiscriminatorForString(String discriminator) {
         return switch (discriminator) {
             case DatabaseConstants.ADMIN_DISCRIMINATOR -> AdminMgd.class;
-            case DatabaseConstants.MECHANIC_DISCRIMINATOR -> MechanicMgd.class;
-            case DatabaseConstants.CLIENT_DISCRIMINATOR -> ClientMgd.class;
+            case DatabaseConstants.LIBRARIAN_DISCRIMINATOR -> LibrarianMgd.class;
+            case DatabaseConstants.READER_DISCRIMINATOR -> ReaderMgd.class;
             case null, default ->
                     throw new ApplicationDatabaseException("Unknown user type: " + discriminator);
         };
@@ -125,10 +127,10 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
 
         if (mgdClass.equals(AdminMgd.class)) {
             return new AdminMgd(userDoc);
-        } else if (mgdClass.equals(MechanicMgd.class)) {
-            return new MechanicMgd(userDoc);
-        } else if (mgdClass.equals(ClientMgd.class)) {
-            return new ClientMgd(userDoc);
+        } else if (mgdClass.equals(LibrarianMgd.class)) {
+            return new LibrarianMgd(userDoc);
+        } else if (mgdClass.equals(ReaderMgd.class)) {
+            return new ReaderMgd(userDoc);
         } else {
             throw new ApplicationDatabaseException("Unknown user type: " + discriminatorValue);
         }
@@ -142,8 +144,7 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
         Bson doubleFilters = Filters.and(idFilter, discriminatorFilter);
         T foundUser = userCollection.find(doubleFilters).first();
         if (foundUser == null) {
-            //todo user exception 404
-            // throw  new RuntimeException("User with provided identifier could not be found!!!");
+            throw new UserNotFoundException();
         }
         return foundUser;
     }

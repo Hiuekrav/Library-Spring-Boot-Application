@@ -14,13 +14,19 @@ public interface IRentService extends IObjectService {
 
     Rent findRentById(UUID id);
 
-    List<Rent> findAllActiveByClientID(UUID clientId);
+    List<Rent> findAll();
 
-    List<Rent> findAllArchivedByClientID(UUID clientId);
+    List<Rent> findAllByReaderId(UUID readerId);
 
-    List<Rent> findAllActiveByVehicleID(UUID clientId);
+    List<Rent> findAllByBookId(UUID bookId);
 
-    List<Rent> findAllArchivedByVehicleID(UUID clientId);
+    List<Rent> findAllActiveByReaderId(UUID readerId);
+
+    List<Rent> findAllArchivedByReaderId(UUID readerId);
+
+    List<Rent> findAllActiveByBookId(UUID bookId);
+
+    List<Rent> findAllArchivedByBookId(UUID bookId);
 
     Rent updateRent(UUID id, LocalDateTime endTime);
 

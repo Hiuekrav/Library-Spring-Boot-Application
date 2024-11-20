@@ -1,5 +1,6 @@
 package pl.pas.rest.mgd.users;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,6 +16,7 @@ import pl.pas.rest.utils.consts.DatabaseConstants;
 import java.util.Objects;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper=true)
 @SuperBuilder(toBuilder = true)
 @ToString
 @Getter @Setter
@@ -33,13 +35,13 @@ public class UserMgd extends AbstractEntityMgd {
     @BsonProperty(DatabaseConstants.USER_PASSWORD)
     private String password;
 
-    @BsonProperty(DatabaseConstants.CLIENT_CITY_NAME)
+    @BsonProperty(DatabaseConstants.USER_CITY_NAME)
     private String cityName;
 
-    @BsonProperty(DatabaseConstants.CLIENT_STREET_NAME)
+    @BsonProperty(DatabaseConstants.USER_STREET_NAME)
     private String streetName;
 
-    @BsonProperty(DatabaseConstants.CLIENT_STREET_NUMBER)
+    @BsonProperty(DatabaseConstants.USER_STREET_NUMBER)
     private String streetNumber;
 
     @BsonProperty(DatabaseConstants.USER_ACTIVE)
@@ -52,9 +54,9 @@ public class UserMgd extends AbstractEntityMgd {
             @BsonProperty(DatabaseConstants.USER_LAST_NAME) String lastName,
             @BsonProperty(DatabaseConstants.USER_EMAIL) String email,
             @BsonProperty(DatabaseConstants.USER_PASSWORD) String password,
-            @BsonProperty(DatabaseConstants.CLIENT_CITY_NAME) String cityName,
-            @BsonProperty(DatabaseConstants.CLIENT_STREET_NAME) String streetName,
-            @BsonProperty(DatabaseConstants.CLIENT_STREET_NUMBER) String streetNumber) {
+            @BsonProperty(DatabaseConstants.USER_CITY_NAME) String cityName,
+            @BsonProperty(DatabaseConstants.USER_STREET_NAME) String streetName,
+            @BsonProperty(DatabaseConstants.USER_STREET_NUMBER) String streetNumber) {
         super(id);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -86,32 +88,9 @@ public class UserMgd extends AbstractEntityMgd {
         this.lastName = document.getString(DatabaseConstants.USER_LAST_NAME);
         this.email = document.getString(DatabaseConstants.USER_EMAIL);
         this.password = document.getString(DatabaseConstants.USER_PASSWORD);
-        this.cityName = document.getString(DatabaseConstants.CLIENT_CITY_NAME);
-        this.streetName = document.getString(DatabaseConstants.CLIENT_STREET_NAME);
-        this.streetNumber = document.getString(DatabaseConstants.CLIENT_STREET_NUMBER);
+        this.cityName = document.getString(DatabaseConstants.USER_CITY_NAME);
+        this.streetName = document.getString(DatabaseConstants.USER_STREET_NAME);
+        this.streetNumber = document.getString(DatabaseConstants.USER_STREET_NUMBER);
         this.active = document.getBoolean(DatabaseConstants.USER_ACTIVE);
-    }
-
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserMgd userMgd = (UserMgd) o;
-        return Objects.equals(super.getId(), userMgd.getId())
-                && Objects.equals(firstName, userMgd.firstName)
-                && Objects.equals(lastName, userMgd.lastName)
-                && Objects.equals(email, userMgd.email)
-                && Objects.equals(password, userMgd.password)
-                && Objects.equals(cityName, userMgd.cityName)
-                && Objects.equals(streetName, userMgd.streetName)
-                && Objects.equals(streetNumber, userMgd.streetNumber)
-                && Objects.equals(active, userMgd.active);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, email, password, cityName, streetName, streetNumber, active);
     }
 }

@@ -11,14 +11,14 @@ public interface IRentRepository extends IObjectRepository<RentMgd> {
     RentMgd findArchiveById(UUID id);
 
     // By client
-    List<RentMgd> findAllActiveByClientId(UUID clientId);
-    List<RentMgd> findAllByClientId(UUID clientId);
-    List<RentMgd> findAllArchivedByClientId(UUID clientId);
+    List<RentMgd> findAllActiveByReaderId(UUID readerId);
+    List<RentMgd> findAllByReaderId(UUID readerId);
+    List<RentMgd> findAllArchivedByReaderId(UUID readerId);
 
     // By vehicle
-    List<RentMgd> findAllActiveByVehicleId(UUID vehicleId);
-    List<RentMgd> findAllByVehicleId(UUID vehicleId);
-    List<RentMgd> findAllArchivedByVehicleId(UUID vehicleId);
+    List<RentMgd> findAllActiveByBookId(UUID bookId);
+    List<RentMgd> findAllByBookId(UUID bookId);
+    List<RentMgd> findAllArchivedByBookId(UUID bookId);
 
     void moveRentToArchived(UUID rentId);
 }

@@ -6,6 +6,6 @@ import java.util.UUID;
 public record RentCreateDTO (
         LocalDateTime beginTime,
         LocalDateTime endTime,
-        UUID clientId,
-        UUID carId
+        UUID readerId,
+        UUID bookId
 ) {}

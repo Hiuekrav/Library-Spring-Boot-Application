@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pas.dto.create.UserCreateDTO;
 import pl.pas.dto.update.UserUpdateDTO;
-import pl.pas.rest.mgd.users.ClientMgd;
+import pl.pas.rest.mgd.users.ReaderMgd;
 import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.mgd.RentMgd;
 import pl.pas.rest.model.users.User;
 
-import pl.pas.rest.repositories.implementations.CarRepository;
+import pl.pas.rest.repositories.implementations.BookRepository;
 import pl.pas.rest.repositories.implementations.RentRepository;
 
 import pl.pas.rest.repositories.implementations.UserRepository;
-import pl.pas.rest.repositories.interfaces.ICarRepository;
+import pl.pas.rest.repositories.interfaces.IBookRepository;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.repositories.interfaces.IUserRepository;
 import pl.pas.rest.services.implementations.ObjectService;
@@ -26,21 +26,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ClientService extends ObjectService implements IClientService {
 
-    private final IUserRepository<ClientMgd> clientRepository;
+    private final IUserRepository<ReaderMgd> clientRepository;
     private final IRentRepository rentRepository;
-    private final ICarRepository carRepository;
+    private final IBookRepository carRepository;
 
     public ClientService() {
         super();
-        this.clientRepository = new UserRepository<>(super.getClient(), ClientMgd.class);
-        this.carRepository = new CarRepository(super.getClient());
-        this.rentRepository = new RentRepository(super.getClient(), RentMgd.class);
+        this.clientRepository = new UserRepository(super.getClient(), ReaderMgd.class);
+        this.carRepository = new BookRepository(super.getClient());
+        this.rentRepository = new RentRepository(super.getClient());
     }
 
 
     @Override
     public User createClient(UserCreateDTO createDTO) {
-        ClientMgd userMgd = new ClientMgd(
+        ReaderMgd userMgd = new ReaderMgd(
                 UUID.randomUUID(),
                 createDTO.firstName(),
                 createDTO.lastName(),
@@ -71,7 +71,7 @@ public class ClientService extends ObjectService implements IClientService {
 
     @Override
     public void updateClient(UserUpdateDTO updateDTO) {
-        ClientMgd modifiedClient = ClientMgd.builder().
+        ReaderMgd modifiedClient = ReaderMgd.builder().
                 id(updateDTO.id()).
                 firstName(updateDTO.firstName()).
                 lastName(updateDTO.lastName()).
@@ -87,7 +87,7 @@ public class ClientService extends ObjectService implements IClientService {
     @Override
     public void removeClient(UUID clientId) {
         clientRepository.findById(clientId);
-        List<RentMgd> rents = rentRepository.findAllByClientId(clientId);
+        List<RentMgd> rents = rentRepository.findAllByReaderId(clientId);
         if (!rents.isEmpty()) {
             throw new RuntimeException("Unable to remove client, has active or archived rents");
         }

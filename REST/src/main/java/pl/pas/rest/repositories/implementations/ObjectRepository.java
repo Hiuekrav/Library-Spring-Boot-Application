@@ -32,11 +32,11 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         this.client = client;
         this.mgdClass = mgdClass;
         this.database = client.getDatabase(DatabaseConstants.DATABASE_NAME);
-        if (mgdClass.equals(CarMgd.class) ) {
-            this.collectionName = DatabaseConstants.CAR_COLLECTION_NAME;
+        if (mgdClass.equals(BookMgd.class) ) {
+            this.collectionName = DatabaseConstants.BOOK_COLLECTION_NAME;
         }
         else if (mgdClass.equals(UserMgd.class) ) {
-            this.collectionName = DatabaseConstants.CLIENT_COLLECTION_NAME;
+            this.collectionName = DatabaseConstants.USER_COLLECTION_NAME;
         }
         else if (mgdClass.equals(RentMgd.class) ) {
            this.collectionName = DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME;
@@ -114,7 +114,7 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
             // ID not found - create operation
             List<Field> fieldList = new ArrayList<>();
             getAllFields(fieldList, object.getClass());
-            fieldList.removeIf( (field)-> Objects.equals(field.getAnnotation(BsonProperty.class).value(), DatabaseConstants.CAR_RENTED));
+            fieldList.removeIf( (field)-> Objects.equals(field.getAnnotation(BsonProperty.class).value(), DatabaseConstants.BOOK_RENTED));
             boolean nullFields = fieldList.stream().anyMatch(
                     (field) -> {
                         try {

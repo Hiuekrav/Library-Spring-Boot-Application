@@ -5,10 +5,9 @@ import java.util.UUID;
 
 public record RentOutputDTO(
         UUID id,
-        UserOutputDTO userOutputDTO,
-        CarOutputDTO carOutputDTO,
+        UserDataOutputDTO userOutputDTO,
+        BookDataOutputDTO bookOutputDTO,
         LocalDateTime beginTime,
         LocalDateTime endTime,
-        Double rentCost,
         boolean active
 ){}
