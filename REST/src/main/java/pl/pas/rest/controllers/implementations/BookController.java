@@ -28,9 +28,9 @@ public class BookController implements IBookController {
     }
 
     @Override
-    public ResponseEntity<?> createCar(BookCreateDTO carCreateDTO) {
-        Book car = bookService.createBook(carCreateDTO);
-        BookOutputDTO outputDTO = BookMapper.toBookOutputDTO(car);
+    public ResponseEntity<?> createBook(BookCreateDTO bookCreateDTO) {
+        Book book = bookService.createBook(bookCreateDTO);
+        BookOutputDTO outputDTO = BookMapper.toBookOutputDTO(book);
         return ResponseEntity.ok().body(outputDTO);
     }
 

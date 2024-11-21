@@ -1,16 +1,13 @@
 package pl.pas.rest.repositories.implementations;
 
-import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import pl.pas.rest.exceptions.rent.RentNotFoundException;
-import pl.pas.rest.mgd.BookMgd;
 import pl.pas.rest.mgd.RentMgd;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
@@ -106,8 +103,15 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
 
-        Bson filter = Filters.eq(DatabaseConstants.ID, id);
-        return rentMgdMongoCollection.find(filter).first();
+        Bson filters = Filters.and(
+                Filters.eq(DatabaseConstants.ID, id),
+                Filters.lt(DatabaseConstants.RENT_BEGIN_TIME, LocalDateTime.now())
+        );
+        RentMgd rentMgd = rentMgdMongoCollection.find(filters).first();
+        if (rentMgd == null) {
+            throw new RentNotFoundException();
+        }
+        return rentMgd;
     }
 
     @Override
@@ -118,7 +122,11 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
                 Filters.eq(DatabaseConstants.ID, id),
                 Filters.gt(DatabaseConstants.RENT_BEGIN_TIME, LocalDateTime.now())
         );
-        return rentMgdMongoCollection.find(filters).first();
+        RentMgd rentMgd = rentMgdMongoCollection.find(filters).first();
+        if (rentMgd == null) {
+            throw new RentNotFoundException();
+        }
+        return rentMgd;
     }
 
     @Override
@@ -127,7 +135,11 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
                 .getCollection(DatabaseConstants.RENT_ARCHIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
 
         Bson filter = Filters.eq(DatabaseConstants.ID, id);
-        return rentMgdMongoCollection.find(filter).first();
+        RentMgd rentMgd = rentMgdMongoCollection.find(filter).first();
+        if (rentMgd == null) {
+            throw new RentNotFoundException();
+        }
+        return rentMgd;
     }
 
     @Override
@@ -145,7 +157,6 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
                 return foundRent;
             }
         }
-
         throw new RentNotFoundException();
     }
 
@@ -156,8 +167,11 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
 
-        Bson filter = Filters.eq(DatabaseConstants.RENT_READER_ID, readerId);
-        return rentMgdMongoCollection.find(filter).into(new ArrayList<>());
+        Bson filters = Filters.and(
+                Filters.eq(DatabaseConstants.RENT_READER_ID, readerId),
+                Filters.lt(DatabaseConstants.RENT_BEGIN_TIME, LocalDateTime.now())
+        );
+        return rentMgdMongoCollection.find(filters).into(new ArrayList<>());
     }
 
     @Override
@@ -182,8 +196,13 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
 
     @Override
     public List<RentMgd> findAllByReaderId(UUID readerId) {
-        return Stream.concat(findAllActiveByReaderId(readerId).stream(),
-                            findAllArchivedByReaderId(readerId).stream()).toList();
+        return Stream.concat(
+                Stream.concat(
+                        findAllActiveByReaderId(readerId).stream(),
+                        findAllFutureByReaderId(readerId).stream()
+                ),
+                findAllArchivedByReaderId(readerId).stream()
+        ).toList();
     }
 
     // By book
@@ -193,8 +212,11 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
         MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
 
-        Bson filter = Filters.eq(DatabaseConstants.RENT_BOOK_ID, bookId);
-        return rentMgdMongoCollection.find(filter).into(new ArrayList<>());
+        Bson filters = Filters.and(
+                Filters.eq(DatabaseConstants.RENT_BOOK_ID, bookId),
+                Filters.lt(DatabaseConstants.RENT_BEGIN_TIME, LocalDateTime.now())
+        );
+        return rentMgdMongoCollection.find(filters).into(new ArrayList<>());
     }
 
     @Override
@@ -219,8 +241,12 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
 
     @Override
     public List<RentMgd> findAllByBookId(UUID bookId) {
-        return Stream.concat(findAllArchivedByBookId(bookId).stream(),
-                            findAllArchivedByBookId(bookId).stream()).toList();
+        return Stream.concat(
+                Stream.concat(findAllActiveByBookId(bookId).stream(),
+                            findAllFutureByBookId(bookId).stream()),
+                findAllArchivedByBookId(bookId).stream()
+        )
+        .toList();
     }
 
 }

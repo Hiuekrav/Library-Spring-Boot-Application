@@ -13,7 +13,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
+import pl.pas.rest.exceptions.book.BookNotFoundException;
 import pl.pas.rest.exceptions.user.UserNotFoundException;
+import pl.pas.rest.mgd.BookMgd;
 import pl.pas.rest.mgd.users.AdminMgd;
 import pl.pas.rest.mgd.users.ReaderMgd;
 import pl.pas.rest.mgd.users.LibrarianMgd;
@@ -119,11 +121,9 @@ public class UserRepository extends ObjectRepository<UserMgd> implements IUserRe
         }
     }
 
+    @Override
     public UserMgd findById(UUID id) {
-        MongoCollection<UserMgd> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
-                getMgdClass());
-        Bson idFilter = Filters.eq(DatabaseConstants.ID, id);
-        UserMgd foundUser = userCollection.find(idFilter).first();
+        UserMgd foundUser = super.findByIdOrNull(id);
         if (foundUser == null) {
             throw new UserNotFoundException();
         }

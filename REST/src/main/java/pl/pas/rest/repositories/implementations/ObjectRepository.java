@@ -6,9 +6,11 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import lombok.Getter;
+import org.bson.Document;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
+import pl.pas.rest.exceptions.ApplicationBaseException;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
 import pl.pas.rest.mgd.*;
 import pl.pas.rest.mgd.users.UserMgd;
@@ -75,6 +77,16 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         return Updates.combine(updates);
     }
 
+//    @Override
+//    public T findByIdOrNull(UUID id) {
+//        try {
+//            MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
+//            Bson filter = Filters.eq(DatabaseConstants.ID, id);
+//            return collection.find(filter).first();
+//        } catch (MongoCommandException e) {
+//            throw new ApplicationDatabaseException(e);
+//        }
+//    }
     @Override
     public T findByIdOrNull(UUID id) {
         MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
@@ -87,13 +99,9 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         try {
             MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
             Bson filter = Filters.eq(DatabaseConstants.ID, id);
-            T foundDoc = collection.find(filter).first();
-            if (foundDoc == null) {
-                throw new RuntimeException("Error finding document: " + mgdClass.getSimpleName() + " with provided ID");
-            }
-            return foundDoc;
+            return collection.find(filter).first();
         } catch (MongoCommandException e) {
-            throw new RuntimeException("Error finding client by ID", e);
+            throw new ApplicationDatabaseException(e.getMessage());
         }
     }
 
@@ -123,11 +131,11 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
                             field.setAccessible(true);
                             return field.get(object) == null;
                         } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
+                            throw new ApplicationBaseException(e);
                         }
                     });
             if (nullFields) {
-                throw new RuntimeException("Tried to save null values!!!");
+                throw new ApplicationDatabaseException("Tried to save null values!!!");
             }
             MongoCollection<T> docCollection = this.database.getCollection(collectionName, mgdClass);
             docCollection.insertOne(object);
@@ -139,7 +147,6 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
             MongoCollection<T> docCollection = this.database.getCollection(collectionName, mgdClass);
             docCollection.updateOne(filter, combinedUpdates);
             return docCollection.find(filter).first();
-
         }
     }
 
@@ -151,10 +158,10 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
             DeleteResult result = collection.deleteOne(filter);
 
             if (result.getDeletedCount() == 0) {
-                throw new RuntimeException("User with provided ID not found!");
+                throw new ApplicationDatabaseException("Object with provided ID not found!");
             }
         } catch (MongoCommandException e) {
-            throw new RuntimeException("Error deleting client.", e);
+            throw new ApplicationDatabaseException("Error deleting client", e);
         }
     }
 

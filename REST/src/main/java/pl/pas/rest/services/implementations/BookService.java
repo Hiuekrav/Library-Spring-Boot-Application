@@ -38,7 +38,9 @@ public class BookService extends ObjectService implements IBookService {
                 author(bookCreateDTO.author()).
                 numberOfPages(bookCreateDTO.numberOfPages()).
                 genre(Book.Genre.valueOf(bookCreateDTO.genre())).
-                publishedDate(bookCreateDTO.publishedDate())
+                publishedDate(bookCreateDTO.publishedDate()).
+                rented(0).
+                archive(false)
                 .build();
 
         BookMgd createdBook;

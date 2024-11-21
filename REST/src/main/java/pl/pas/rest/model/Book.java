@@ -45,6 +45,7 @@ public class Book extends AbstractEntity {
         this.author = bookMgd.getAuthor();
         this.numberOfPages = bookMgd.getNumberOfPages();
         this.genre = bookMgd.getGenre();
+        this.publishedDate = bookMgd.getPublishedDate();
         this.rented = bookMgd.getRented() == 1;
         this.archive = bookMgd.isArchive();
     }

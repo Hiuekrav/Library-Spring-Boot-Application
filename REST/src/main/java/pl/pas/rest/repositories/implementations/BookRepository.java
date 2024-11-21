@@ -76,13 +76,12 @@ public class BookRepository extends ObjectRepository<BookMgd> implements IBookRe
 
     @Override
     public BookMgd findById(UUID id) {
-        BookMgd foundVehicle = findByIdOrNull(id);
-        if (foundVehicle == null) {
+        BookMgd foundBook = super.findByIdOrNull(id);
+        if (foundBook == null) {
             throw new BookNotFoundException();
         }
-        return foundVehicle;
+        return foundBook;
     }
-
 
     @Override
     public BookMgd changeRentedStatus(UUID id, Boolean status) {

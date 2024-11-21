@@ -15,5 +15,5 @@ public interface IBookController {
     ResponseEntity<?> findById(@PathVariable UUID id);
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createCar(@RequestBody BookCreateDTO bookCreateDTO);
+    ResponseEntity<?> createBook(@RequestBody BookCreateDTO bookCreateDTO);
 }
