@@ -11,6 +11,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.springframework.stereotype.Repository;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
 import pl.pas.rest.exceptions.user.UserNotFoundException;
 import pl.pas.rest.mgd.users.AdminMgd;
@@ -21,17 +22,14 @@ import pl.pas.rest.repositories.interfaces.IUserRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
-public class UserRepository<T extends UserMgd> extends ObjectRepository<T> implements IUserRepository<T> {
+public class UserRepository extends ObjectRepository<UserMgd> implements IUserRepository {
 
-    private final String discriminatorValue;
-
-    public UserRepository(MongoClient client, Class<T> mgdClass) {
-        super(client, mgdClass);
-
-        this.discriminatorValue = getUserDiscriminatorForClass(mgdClass);
+    public UserRepository(MongoClient client) {
+        super(client, UserMgd.class);
 
         boolean collectionExist = getDatabase().listCollectionNames()
                 .into(new ArrayList<>()).contains(DatabaseConstants.USER_COLLECTION_NAME);
@@ -87,20 +85,6 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
         }
     }
 
-
-    private String getUserDiscriminatorForClass(Class<?> mgdClass) {
-        if (mgdClass.equals(AdminMgd.class)) {
-            return DatabaseConstants.ADMIN_DISCRIMINATOR;
-        }
-        else if (mgdClass.equals(LibrarianMgd.class)) {
-            return DatabaseConstants.LIBRARIAN_DISCRIMINATOR;
-        }
-        else if (mgdClass.equals(ReaderMgd.class)) {
-            return DatabaseConstants.READER_DISCRIMINATOR;
-        }
-        return DatabaseConstants.USER_DISCRIMINATOR;
-    }
-
     public static Class<?> getDiscriminatorForString(String discriminator) {
         return switch (discriminator) {
             case DatabaseConstants.ADMIN_DISCRIMINATOR -> AdminMgd.class;
@@ -118,8 +102,7 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
         Bson filter = Filters.eq(DatabaseConstants.ID, id);
         Document userDoc = userMgdMongoCollection.find(filter).first();
         if (userDoc == null) {
-            //todo userNotFoundException
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException();
         }
         String discriminatorValue = userDoc.getString(DatabaseConstants.BSON_DISCRIMINATOR_KEY);
 
@@ -136,13 +119,11 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
         }
     }
 
-    public T findById(UUID id) {
-        MongoCollection<T> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
+    public UserMgd findById(UUID id) {
+        MongoCollection<UserMgd> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
                 getMgdClass());
         Bson idFilter = Filters.eq(DatabaseConstants.ID, id);
-        Bson discriminatorFilter = Filters.eq(DatabaseConstants.BSON_DISCRIMINATOR_KEY, discriminatorValue);
-        Bson doubleFilters = Filters.and(idFilter, discriminatorFilter);
-        T foundUser = userCollection.find(doubleFilters).first();
+        UserMgd foundUser = userCollection.find(idFilter).first();
         if (foundUser == null) {
             throw new UserNotFoundException();
         }
@@ -152,20 +133,13 @@ public class UserRepository<T extends UserMgd> extends ObjectRepository<T> imple
 
 
     @Override
-    public T findByEmail(String email) {
+    public List<UserMgd> findByEmail(String email) {
         ClientSession clientSession = this.getClient().startSession();
         try {
-            MongoCollection<T> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
+            MongoCollection<UserMgd> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
                     getMgdClass());
-            Bson emailFilter = Filters.eq(DatabaseConstants.USER_EMAIL, email);
-            T foundUser = userCollection.find(emailFilter).first();
-
-            if (foundUser == null) {
-                //todo user exception 404
-                // throw  new RuntimeException("User with provided email could not be found!!!");
-            }
-            return foundUser;
-
+            Bson emailFilter = Filters.regex(DatabaseConstants.USER_EMAIL, ".*" + email + ".*", "i");
+            return userCollection.find(emailFilter).into(new ArrayList<>());
         } catch (MongoCommandException e) {
             clientSession.close();
             throw new ApplicationDatabaseException("MongoCommandException!" + e.getMessage());

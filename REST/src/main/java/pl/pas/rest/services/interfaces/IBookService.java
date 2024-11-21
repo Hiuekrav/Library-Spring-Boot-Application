@@ -12,7 +12,7 @@ public interface IBookService extends IObjectService {
 
     Book findBookById(UUID id);
 
-    Book findBookByTitle(String plateNumber);
+    List<Book> findBookByTitle(String plateNumber);
 
     List<Book> findAll();
 

@@ -1,12 +1,10 @@
 package pl.pas.rest.controllers.implementations;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.pas.dto.create.UserCreateDTO;
 import pl.pas.dto.output.UserOutputDTO;
 import pl.pas.dto.update.UserUpdateDTO;
@@ -34,7 +32,7 @@ public class UserController implements IUserController {
     private final String userCreateURL = GeneralConstants.APPLICATION_CONTEXT + "/users/%s";
 
     @Override
-    public ResponseEntity<?> createAdmin(UserCreateDTO userCreateDTO) {
+    public ResponseEntity<?> createAdmin(@Valid @RequestBody UserCreateDTO userCreateDTO) {
         User createdUser = userService.createAdmin(userCreateDTO);
         UserOutputDTO outputDTO = UserMapper.toUserOutputDTO(createdUser);
         return ResponseEntity.created(URI.create(userCreateURL.formatted(createdUser.getId()))).body(outputDTO);

@@ -1,6 +1,7 @@
 package pl.pas.rest.services.implementations;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pas.dto.create.UserCreateDTO;
 import pl.pas.dto.update.UserUpdateDTO;
@@ -21,16 +22,15 @@ import pl.pas.rest.utils.consts.I18n;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
 @Service
 public class UserService extends ObjectService implements IUserService {
 
-    private final IUserRepository<UserMgd> userRepository;
+    private final IUserRepository userRepository;
     private final IRentRepository rentRepository;
 
     public UserService() {
-        userRepository = new UserRepository<>(super.getClient(), UserMgd.class);
-        rentRepository = new RentRepository(super.getClient());
+        this.userRepository = new UserRepository(super.getClient());
+        this.rentRepository = new RentRepository(super.getClient());
     }
 
     @Override

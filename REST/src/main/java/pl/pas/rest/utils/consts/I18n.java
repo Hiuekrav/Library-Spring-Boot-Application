@@ -12,6 +12,9 @@ public class I18n {
 
     // Rent
     public static String RENT_NOT_FOUND_EXCEPTION = "rent.not.found.exception";
+    public static String RENT_CREATION_EXCEPTION = "rent.creation.exception";
+    public static String RENT_TIMES_INVALID_EXCEPTION = "rent.times.invalid.exception";
+    public static String READER_NOT_FOUND_EXCEPTION = "reader.not.found.exception";
 
 
 }

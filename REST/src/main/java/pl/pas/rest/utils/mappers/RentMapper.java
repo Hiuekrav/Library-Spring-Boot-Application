@@ -10,8 +10,7 @@ public class RentMapper {
                 UserMapper.toUserDataOutputDTO(rent.getReader()),
                 BookMapper.toBookDataOutputDTO(rent.getBook()),
                 rent.getBeginTime(),
-                rent.getEndTime(),
-                rent.isActive()
+                rent.getEndTime()
         );
     }
 }

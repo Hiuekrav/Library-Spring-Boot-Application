@@ -1,5 +1,6 @@
 package pl.pas.rest.controllers.implementations;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class BookController implements IBookController {
     }
 
     @Override
-    public ResponseEntity<?> createCar( BookCreateDTO carCreateDTO) {
+    public ResponseEntity<?> createCar(BookCreateDTO carCreateDTO) {
         Book car = bookService.createBook(carCreateDTO);
         BookOutputDTO outputDTO = BookMapper.toBookOutputDTO(car);
         return ResponseEntity.ok().body(outputDTO);

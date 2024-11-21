@@ -8,6 +8,7 @@ import com.mongodb.client.result.DeleteResult;
 import lombok.Getter;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
+import org.springframework.stereotype.Repository;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
 import pl.pas.rest.mgd.*;
 import pl.pas.rest.mgd.users.UserMgd;
@@ -19,6 +20,7 @@ import java.util.*;
 
 
 @Getter
+@Repository
 public abstract class ObjectRepository<T extends AbstractEntityMgd> implements IObjectRepository<T> {
 
     private final Class<T> mgdClass;

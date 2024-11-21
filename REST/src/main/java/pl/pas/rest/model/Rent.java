@@ -16,7 +16,6 @@ public class Rent extends AbstractEntity {
     private LocalDateTime endTime;
     private User reader;
     private Book book;
-    private boolean active;
 
     public Rent(UUID id, LocalDateTime beginTime, LocalDateTime endTime, User reader, Book book) {
         super(id);
@@ -24,7 +23,6 @@ public class Rent extends AbstractEntity {
         this.endTime = endTime;
         this.reader = reader;
         this.book = book;
-        this.active = !beginTime.isAfter(LocalDateTime.now());
     }
 
     public Rent(RentMgd rentMgd, User reader, Book book) {
@@ -47,7 +45,5 @@ public class Rent extends AbstractEntity {
         this.endTime = endTime;
         this.reader = reader;
         this.book = book;
-        this.active = true;
     }
-
 }

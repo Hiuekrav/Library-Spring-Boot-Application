@@ -2,13 +2,14 @@ package pl.pas.rest.repositories.interfaces;
 
 import pl.pas.rest.mgd.users.UserMgd;
 
+import java.util.List;
 import java.util.UUID;
 
-public interface IUserRepository<T extends UserMgd> extends IObjectRepository<T> {
+public interface IUserRepository extends IObjectRepository<UserMgd> {
 
-    T findById(UUID id);
+    UserMgd findById(UUID id);
 
     UserMgd findAnyUserById(UUID id);
 
-    T findByEmail(String email);
+    List<UserMgd> findByEmail(String email);
 }

@@ -1,5 +1,6 @@
 package pl.pas.rest.controllers.interfaces;
 
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +17,10 @@ public interface IUserController {
     ResponseEntity<?> createAdmin(@RequestBody UserCreateDTO userCreateDTO);
 
     @PostMapping(value = "create-librarian", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createLibrarian(@RequestBody UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createLibrarian(@RequestBody @Valid  UserCreateDTO userCreateDTO);
 
     @PostMapping(value = "create-reader", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createReader(@RequestBody UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createReader(@RequestBody @Valid UserCreateDTO userCreateDTO);
 
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> findById(@PathVariable UUID id);
@@ -27,13 +28,13 @@ public interface IUserController {
     @GetMapping(value = "all", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> findAll();
 
-    @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> updateUser(@RequestBody UserUpdateDTO userUpdateDTO);
 
-    @PutMapping(value = "{id}/activate")
+    @PostMapping(value = "{id}/activate")
     ResponseEntity<?> activateUser(@PathVariable UUID id);
 
-    @PutMapping(value = "{id}/deactivate")
+    @PostMapping(value = "{id}/deactivate")
     ResponseEntity<?> deactivateUser(@PathVariable UUID id);
 
 }

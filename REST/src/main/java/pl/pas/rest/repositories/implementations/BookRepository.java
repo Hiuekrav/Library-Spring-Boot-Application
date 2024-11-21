@@ -8,6 +8,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.springframework.stereotype.Repository;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
 import pl.pas.rest.exceptions.book.BookNotFoundException;
 import pl.pas.rest.mgd.BookMgd;
@@ -86,11 +87,11 @@ public class BookRepository extends ObjectRepository<BookMgd> implements IBookRe
     @Override
     public BookMgd changeRentedStatus(UUID id, Boolean status) {
 
-        MongoCollection<BookMgd> vehicleCollection = super.getDatabase().getCollection(DatabaseConstants.BOOK_COLLECTION_NAME,
+        MongoCollection<BookMgd> bookCollection = super.getDatabase().getCollection(DatabaseConstants.BOOK_COLLECTION_NAME,
                 getMgdClass());
         Bson idFilter = Filters.eq(DatabaseConstants.ID, id);
-        BookMgd foundCar = vehicleCollection.find(idFilter).first();
-        if (foundCar == null) {
+        BookMgd foundBook = bookCollection.find(idFilter).first();
+        if (foundBook == null) {
             throw new BookNotFoundException();
         }
         Bson updateOperation;
@@ -100,8 +101,8 @@ public class BookRepository extends ObjectRepository<BookMgd> implements IBookRe
         else {
             updateOperation = Updates.inc(DatabaseConstants.BOOK_RENTED, -1);
         }
-        vehicleCollection.updateOne(idFilter, updateOperation);
-        return vehicleCollection.find(idFilter).first();
+        bookCollection.updateOne(idFilter, updateOperation);
+        return bookCollection.find(idFilter).first();
     }
 
 }

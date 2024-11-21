@@ -8,6 +8,5 @@ public record RentOutputDTO(
         UserDataOutputDTO userOutputDTO,
         BookDataOutputDTO bookOutputDTO,
         LocalDateTime beginTime,
-        LocalDateTime endTime,
-        boolean active
+        LocalDateTime endTime
 ){}

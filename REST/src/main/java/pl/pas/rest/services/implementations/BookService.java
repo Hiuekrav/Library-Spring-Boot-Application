@@ -2,6 +2,8 @@ package pl.pas.rest.services.implementations;
 
 import com.mongodb.MongoWriteException;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.pas.dto.create.BookCreateDTO;
 import pl.pas.dto.update.BookUpdateDTO;
@@ -17,7 +19,6 @@ import pl.pas.rest.services.interfaces.IBookService;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
 @Service
 public class BookService extends ObjectService implements IBookService {
 
@@ -25,7 +26,6 @@ public class BookService extends ObjectService implements IBookService {
     private final IRentRepository rentRepository;
 
     public BookService() {
-        super();
         this.bookRepository = new BookRepository(super.getClient());
         this.rentRepository = new RentRepository(super.getClient());
     }
@@ -57,8 +57,8 @@ public class BookService extends ObjectService implements IBookService {
     }
 
     @Override
-    public Book findBookByTitle(String plateNumber) {
-        return new Book(bookRepository.findByTitle(plateNumber));
+    public List<Book> findBookByTitle(String plateNumber) {
+        return bookRepository.findByTitle(plateNumber).stream().map(Book::new).toList();
     }
 
     @Override
