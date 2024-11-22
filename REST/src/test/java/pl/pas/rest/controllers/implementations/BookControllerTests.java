@@ -192,7 +192,6 @@ public class BookControllerTests {
 
     @Test
     void testUpdateBook() {
-        //todo nie dziala
         BookCreateDTO createDTO = new BookCreateDTO("Wiedzmin 4", "Sapkowski",
                 300, Genre.FANTASY, LocalDate.of(2020, 1, 1));
         Book createdBook = bookService.createBook(createDTO);

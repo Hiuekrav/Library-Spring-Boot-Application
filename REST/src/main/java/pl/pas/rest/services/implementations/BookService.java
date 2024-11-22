@@ -96,17 +96,14 @@ public class BookService extends ObjectService implements IBookService {
                 .numberOfPages(updateDTO.numberOfPages())
                 .build();
 
-        List<BookMgd> foundBooksWithTitle = bookRepository.findByTitle(updateDTO.title());
-        System.out.println(">>>> size of list title: " + foundBooksWithTitle.size());
-        for (BookMgd bookMgd : foundBooksWithTitle) {
-            if (bookMgd.getTitle().equals(updateDTO.title())) {
-                throw new BookTitleAlreadyExistException();
-            }
-        }
-
         bookRepository.findById(updateDTO.id());
         clientSession.startTransaction();
-        BookMgd bookMgd = bookRepository.save(modifiedBook);
+        BookMgd bookMgd;
+        try {
+            bookMgd = bookRepository.save(modifiedBook);
+        } catch (MongoWriteException e) {
+            throw new BookTitleAlreadyExistException();
+        }
         clientSession.commitTransaction();
         System.out.println(">>>>> Book updated!!!!");
         clientSession.close();

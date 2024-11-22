@@ -14,8 +14,6 @@ import pl.pas.rest.mgd.users.LibrarianMgd;
 import pl.pas.rest.mgd.users.ReaderMgd;
 import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.model.users.User;
-import pl.pas.rest.repositories.implementations.RentRepository;
-import pl.pas.rest.repositories.implementations.UserRepository;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.repositories.interfaces.IUserRepository;
 import pl.pas.rest.services.interfaces.IUserService;
@@ -154,7 +152,14 @@ public class UserService extends ObjectService implements IUserService {
         if (!existingUsers.isEmpty()) {
             throw new EmailAlreadyExistException();
         }
-        UserMgd updatedUser = userRepository.save(modified);
+
+        UserMgd updatedUser;
+        try {
+            updatedUser = userRepository.save(modified);
+        } catch (MongoWriteException e) {
+            throw new EmailAlreadyExistException();
+        }
+
         return new User(updatedUser);
     }
 
