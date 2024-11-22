@@ -1,8 +1,6 @@
 package pl.pas.rest.repositories.implementations;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.MongoCommandException;
-import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
@@ -13,25 +11,25 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
-import pl.pas.rest.exceptions.book.BookNotFoundException;
 import pl.pas.rest.exceptions.user.UserNotFoundException;
-import pl.pas.rest.mgd.BookMgd;
 import pl.pas.rest.mgd.users.AdminMgd;
 import pl.pas.rest.mgd.users.ReaderMgd;
 import pl.pas.rest.mgd.users.LibrarianMgd;
 import pl.pas.rest.mgd.users.UserMgd;
+import pl.pas.rest.repositories.MyMongoClient;
 import pl.pas.rest.repositories.interfaces.IUserRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
+import pl.pas.rest.utils.consts.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
+@Repository
 public class UserRepository extends ObjectRepository<UserMgd> implements IUserRepository {
 
-    public UserRepository(MongoClient client) {
-        super(client, UserMgd.class);
+    public UserRepository(MyMongoClient client) {
+        super(client.getClient(), UserMgd.class);
 
         boolean collectionExist = getDatabase().listCollectionNames()
                 .into(new ArrayList<>()).contains(DatabaseConstants.USER_COLLECTION_NAME);
@@ -46,30 +44,30 @@ public class UserRepository extends ObjectRepository<UserMgd> implements IUserRe
                                             "required": ["_id", "firstName", "lastName", "email", "password",
                                                          "cityName", "streetName", "streetNumber", "active"]
                                             "properties": {
-                                                    "firstName": {
-                                                        "bsonType": "string"
-                                                    },
-                                                    "lastName": {
-                                                        "bsonType": "string"
-                                                    },
-                                                    "email": {
-                                                        "bsonType": "string"
-                                                    },
-                                                    "password": {
-                                                        "bsonType": "string"
-                                                    }
-                                                    "cityName": {
-                                                        "bsonType": "string"
-                                                    },
-                                                    "streetName": {
-                                                        "bsonType": "string"
-                                                    },
-                                                    "streetNumber": {
-                                                        "bsonType": "string"
-                                                     },
-                                                     "active": {
-                                                        "bsonType": "bool"
-                                                     }
+                                                "firstName": {
+                                                    "bsonType": "string"
+                                                },
+                                                "lastName": {
+                                                    "bsonType": "string"
+                                                },
+                                                "email": {
+                                                    "bsonType": "string"
+                                                },
+                                                "password": {
+                                                    "bsonType": "string"
+                                                },
+                                                "cityName": {
+                                                    "bsonType": "string"
+                                                },
+                                                "streetName": {
+                                                    "bsonType": "string"
+                                                },
+                                                "streetNumber": {
+                                                    "bsonType": "string"
+                                                },
+                                                "active": {
+                                                    "bsonType": "bool"
+                                                }
                                             }
                                         }
                                     }
@@ -93,7 +91,7 @@ public class UserRepository extends ObjectRepository<UserMgd> implements IUserRe
             case DatabaseConstants.LIBRARIAN_DISCRIMINATOR -> LibrarianMgd.class;
             case DatabaseConstants.READER_DISCRIMINATOR -> ReaderMgd.class;
             case null, default ->
-                    throw new ApplicationDatabaseException("Unknown user type: " + discriminator);
+                    throw new ApplicationDatabaseException(I18n.APPLICATION_NO_SUCH_ALGORITHM_EXCEPTION + discriminator);
         };
     }
 
@@ -117,7 +115,7 @@ public class UserRepository extends ObjectRepository<UserMgd> implements IUserRe
         } else if (mgdClass.equals(ReaderMgd.class)) {
             return new ReaderMgd(userDoc);
         } else {
-            throw new ApplicationDatabaseException("Unknown user type: " + discriminatorValue);
+            throw new ApplicationDatabaseException(I18n.APPLICATION_NO_SUCH_ALGORITHM_EXCEPTION + discriminatorValue);
         }
     }
 
@@ -130,19 +128,17 @@ public class UserRepository extends ObjectRepository<UserMgd> implements IUserRe
         return foundUser;
     }
 
-
-
     @Override
     public List<UserMgd> findByEmail(String email) {
-        ClientSession clientSession = this.getClient().startSession();
-        try {
-            MongoCollection<UserMgd> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
-                    getMgdClass());
-            Bson emailFilter = Filters.regex(DatabaseConstants.USER_EMAIL, ".*" + email + ".*", "i");
-            return userCollection.find(emailFilter).into(new ArrayList<>());
-        } catch (MongoCommandException e) {
-            clientSession.close();
-            throw new ApplicationDatabaseException("MongoCommandException!" + e.getMessage());
-        }
+        MongoCollection<UserMgd> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
+                getMgdClass());
+        Bson emailFilter = Filters.regex(DatabaseConstants.USER_EMAIL, ".*" + email + ".*", "i");
+        return userCollection.find(emailFilter).into(new ArrayList<>());
+    }
+
+    @Override
+    public void deleteAll() {
+        MongoCollection<Document> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME);
+        userCollection.deleteMany(new Document());
     }
 }

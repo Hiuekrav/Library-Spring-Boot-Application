@@ -7,7 +7,7 @@ import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.model.AbstractEntity;
 import java.util.UUID;
 
-@SuperBuilder(toBuilder = true)
+
 @Getter @Setter
 public class User extends AbstractEntity {
 

@@ -4,14 +4,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.pas.rest.exceptions.ApplicationBaseException;
 import pl.pas.rest.exceptions.ApplicationDatabaseException;
+
+import java.util.Arrays;
 
 @ControllerAdvice
 public class GeneralResolver {
 
-    //todo http teapot
-    @ExceptionHandler(value = {ApplicationDatabaseException.class} )
+    @ExceptionHandler(value = {ApplicationDatabaseException.class})
     public ResponseEntity<?> handleDatabaseException(ApplicationDatabaseException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
+
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<?> handleAllExceptions(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+    }
+
+
+
 }

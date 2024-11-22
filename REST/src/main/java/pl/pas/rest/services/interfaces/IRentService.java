@@ -2,6 +2,7 @@ package pl.pas.rest.services.interfaces;
 
 import com.mongodb.client.MongoClient;
 import pl.pas.dto.create.RentCreateDTO;
+import pl.pas.dto.create.RentCreateShortDTO;
 import pl.pas.rest.model.Rent;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,9 @@ import java.util.UUID;
 public interface IRentService extends IObjectService {
 
     Rent createRent(RentCreateDTO createRentDTO);
+
+
+    Rent createRentWithUnspecifiedTime(RentCreateShortDTO rentCreateShortDTO);
 
     Rent findRentById(UUID id);
 
@@ -36,5 +40,9 @@ public interface IRentService extends IObjectService {
 
     void endRent(UUID id);
 
+    void deleteRent(UUID id);
+
     MongoClient getClient();
+
+    void deleteAll();
 }

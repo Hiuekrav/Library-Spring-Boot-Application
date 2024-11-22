@@ -13,4 +13,7 @@ public interface IBookRepository extends IObjectRepository<BookMgd> {
 
     BookMgd changeRentedStatus(UUID id, Boolean status);
 
+    void changeArchiveStatus(UUID id, Boolean status);
+
+    void deleteAll();
 }

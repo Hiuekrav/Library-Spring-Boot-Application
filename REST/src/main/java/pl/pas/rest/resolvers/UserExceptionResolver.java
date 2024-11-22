@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.pas.dto.output.ExceptionOutputDTO;
+import pl.pas.rest.exceptions.user.EmailAlreadyExistException;
 import pl.pas.rest.exceptions.user.UserDeactivateException;
 import pl.pas.rest.exceptions.user.UserNotFoundException;
 
@@ -19,5 +20,10 @@ public class UserExceptionResolver {
     @ExceptionHandler(value = {UserDeactivateException.class})
     public ResponseEntity<?> handleUserDeactivateException(UserDeactivateException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionOutputDTO(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = {EmailAlreadyExistException.class})
+    public ResponseEntity<?> handleConflictException(EmailAlreadyExistException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionOutputDTO(e.getMessage()));
     }
 }

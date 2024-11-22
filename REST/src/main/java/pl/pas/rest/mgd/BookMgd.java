@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import org.bson.Document;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import pl.pas.dto.Genre;
 import pl.pas.rest.model.Book;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
@@ -31,7 +32,7 @@ public class BookMgd extends AbstractEntityMgd {
     private Integer numberOfPages;
 
     @BsonProperty(DatabaseConstants.BOOK_GENRE)
-    private Book.Genre genre;
+    private Genre genre;
 
     @BsonProperty(DatabaseConstants.BOOK_PUBLISHED_DATE)
     private LocalDate publishedDate;
@@ -48,7 +49,7 @@ public class BookMgd extends AbstractEntityMgd {
             @BsonProperty(DatabaseConstants.BOOK_TITLE) String title,
             @BsonProperty(DatabaseConstants.BOOK_AUTHOR) String author,
             @BsonProperty(DatabaseConstants.BOOK_NUMBER_OF_PAGES) Integer numberOfPages,
-            @BsonProperty(DatabaseConstants.BOOK_GENRE) Book.Genre genre,
+            @BsonProperty(DatabaseConstants.BOOK_GENRE) Genre genre,
             @BsonProperty(DatabaseConstants.BOOK_PUBLISHED_DATE) LocalDate publishedDate,
             @BsonProperty(DatabaseConstants.BOOK_RENTED) Integer rented,
             @BsonProperty(DatabaseConstants.BOOK_ARCHIVE) boolean archive)
@@ -80,7 +81,7 @@ public class BookMgd extends AbstractEntityMgd {
         this.title = document.getString(DatabaseConstants.BOOK_TITLE);
         this.author = document.getString(DatabaseConstants.BOOK_AUTHOR);
         this.numberOfPages = document.getInteger(DatabaseConstants.BOOK_NUMBER_OF_PAGES);
-        this.genre = Book.Genre.valueOf(document.getString(DatabaseConstants.BOOK_GENRE));
+        this.genre = Genre.valueOf(document.getString(DatabaseConstants.BOOK_GENRE));
         this.publishedDate = LocalDate.parse(document.getString(DatabaseConstants.BOOK_PUBLISHED_DATE));
         this.rented = document.getInteger(DatabaseConstants.BOOK_RENTED);
         this.archive = document.getBoolean(DatabaseConstants.BOOK_ARCHIVE);

@@ -1,17 +1,18 @@
 package pl.pas.rest.repositories.implementations;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.MongoCommandException;
-import com.mongodb.client.ClientSession;
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
-import pl.pas.rest.exceptions.ApplicationDatabaseException;
+import pl.pas.rest.exceptions.book.BookChangeStatusException;
 import pl.pas.rest.exceptions.book.BookNotFoundException;
 import pl.pas.rest.mgd.BookMgd;
+import pl.pas.rest.repositories.MyMongoClient;
 import pl.pas.rest.repositories.interfaces.IBookRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
@@ -20,10 +21,11 @@ import java.util.List;
 import java.util.UUID;
 
 
+@Repository
 public class BookRepository extends ObjectRepository<BookMgd> implements IBookRepository {
 
-    public BookRepository(MongoClient client) {
-        super(client, BookMgd.class);
+    public BookRepository(MyMongoClient client) {
+        super(client.getClient(), BookMgd.class);
 
         boolean collectionExist = super.getDatabase().listCollectionNames()
                 .into(new ArrayList<>()).contains(DatabaseConstants.BOOK_COLLECTION_NAME);
@@ -35,13 +37,32 @@ public class BookRepository extends ObjectRepository<BookMgd> implements IBookRe
                                     {
                                         $jsonSchema: {
                                             "bsonType": "object",
-                                            "required": ["_id", "rented"],
+                                            "required": ["_id", "rented", "title", "author", "genre", "publishedDate",
+                                                         "numberOfPages", "archive"],
                                             "properties": {
                                                 "rented" : {
                                                     "bsonType" : "int",
                                                     "minimum" : 0,
                                                     "maximum" : 1,
                                                     "description" : "must be between 0 and 1"
+                                                },
+                                                "title" : {
+                                                    "bsonType" : "string"
+                                                },
+                                                "author" : {
+                                                    "bsonType" : "string"
+                                                },
+                                                "genre" : {
+                                                    "bsonType" : "string"
+                                                },
+                                                "publishedDate" : {
+                                                    "bsonType" : "date"
+                                                },
+                                                "numberOfPages" : {
+                                                    "bsonType" : "int"
+                                                },
+                                                "archive" : {
+                                                    "bsonType" : "bool"
                                                 }
                                             }
                                         }
@@ -61,17 +82,11 @@ public class BookRepository extends ObjectRepository<BookMgd> implements IBookRe
 
     @Override
     public List<BookMgd> findByTitle(String titlePart) {
-        ClientSession clientSession = this.getClient().startSession();
-        try {
-            MongoCollection<BookMgd> bookCollection = super.getDatabase().getCollection(DatabaseConstants.BOOK_COLLECTION_NAME,
-                    BookMgd.class);
-            Bson titleFilter = Filters.regex(DatabaseConstants.BOOK_TITLE,".*" + titlePart + ".*", "i");
-            return bookCollection.find(titleFilter).into(new ArrayList<>());
+        MongoCollection<BookMgd> bookCollection = super.getDatabase().getCollection(DatabaseConstants.BOOK_COLLECTION_NAME,
+                BookMgd.class);
+        Bson titleFilter = Filters.regex(DatabaseConstants.BOOK_TITLE,".*" + titlePart + ".*", "i");
+        return bookCollection.find(titleFilter).into(new ArrayList<>());
 
-        } catch (MongoCommandException e) {
-            clientSession.close();
-            throw new ApplicationDatabaseException("MongoCommandException!" + e.getMessage());
-        }
     }
 
     @Override
@@ -85,7 +100,6 @@ public class BookRepository extends ObjectRepository<BookMgd> implements IBookRe
 
     @Override
     public BookMgd changeRentedStatus(UUID id, Boolean status) {
-
         MongoCollection<BookMgd> bookCollection = super.getDatabase().getCollection(DatabaseConstants.BOOK_COLLECTION_NAME,
                 getMgdClass());
         Bson idFilter = Filters.eq(DatabaseConstants.ID, id);
@@ -100,8 +114,40 @@ public class BookRepository extends ObjectRepository<BookMgd> implements IBookRe
         else {
             updateOperation = Updates.inc(DatabaseConstants.BOOK_RENTED, -1);
         }
-        bookCollection.updateOne(idFilter, updateOperation);
+        try {
+            bookCollection.updateOne(idFilter, updateOperation);
+        }
+        catch (MongoWriteException e) {
+            throw new BookChangeStatusException();
+        }
         return bookCollection.find(idFilter).first();
     }
 
+    @Override
+    public void changeArchiveStatus(UUID id, Boolean status) {
+        MongoCollection<BookMgd> bookCollection = super.getDatabase().getCollection(DatabaseConstants.BOOK_COLLECTION_NAME,
+                getMgdClass());
+        Bson idFilter = Filters.eq(DatabaseConstants.ID, id);
+        BookMgd foundBook = bookCollection.find(idFilter).first();
+        if (foundBook == null) {
+            throw new BookNotFoundException();
+        }
+        Bson updateOperation = Updates.set(DatabaseConstants.BOOK_ARCHIVE, status);
+        try {
+            bookCollection.updateOne(idFilter, updateOperation);
+        }
+        catch (MongoWriteException e) {
+            throw new BookChangeStatusException();
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        MongoCollection<Document> collection = super.getDatabase()
+                .getCollection(DatabaseConstants.BOOK_COLLECTION_NAME);
+        FindIterable<Document> findIterable = collection.find();
+        for (Document document : findIterable) {
+            collection.deleteMany(document);
+        }
+    }
 }

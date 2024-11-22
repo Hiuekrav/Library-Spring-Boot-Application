@@ -20,9 +20,13 @@ public interface IUserService {
 
     List<User> findAll();
 
+    List<User> findByEmail(String email);
+
     User updateUser(UserUpdateDTO updateDTO);
 
     void deactivateUser(UUID id);
 
     void activateUser(UUID id);
+
+    void deleteAll();
 }

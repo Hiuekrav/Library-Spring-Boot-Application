@@ -1,16 +1,18 @@
 package pl.pas.rest.controllers.implementations;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pas.dto.create.RentCreateDTO;
+import pl.pas.dto.create.RentCreateShortDTO;
+import pl.pas.dto.output.RentOutputDTO;
 import pl.pas.rest.controllers.interfaces.IRentController;
 import pl.pas.rest.model.Rent;
 import pl.pas.rest.services.interfaces.IRentService;
 import pl.pas.rest.utils.mappers.RentMapper;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,13 +25,18 @@ public class RentController implements IRentController {
     private final String rentCreatedURI = "rents/%s";
 
 
-    public ResponseEntity<?> createRent(@RequestBody RentCreateDTO rentCreateDTO) {
+    public ResponseEntity<?> createRent(RentCreateDTO rentCreateDTO) {
         Rent rent = rentService.createRent(rentCreateDTO);
         return ResponseEntity.created(URI.create(rentCreatedURI.formatted(rent.getId()))).body(rent);
     }
 
+    @Override
+    public ResponseEntity<?> createRentNow(RentCreateShortDTO rentCreateShortDTO) {
+        Rent rent = rentService.createRentWithUnspecifiedTime(rentCreateShortDTO);
+        return ResponseEntity.created(URI.create(rentCreatedURI.formatted(rent.getId()))).body(rent);
+    }
 
-
+    // By Rent
     public ResponseEntity<?> findAllRents() {
         List<Rent> rents = rentService.findAll();
         if (rents.isEmpty()) {
@@ -38,17 +45,29 @@ public class RentController implements IRentController {
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO));
     }
 
-    public ResponseEntity<?> findById(@PathVariable UUID id) {
+    public ResponseEntity<?> findById(UUID id) {
         Rent rents = rentService.findRentById(id);
         return ResponseEntity.ok(RentMapper.toRentOutputDTO(rents));
     }
 
+
+
+    // By Reader
     public ResponseEntity<?> findAllByReaderId(UUID readerId) {
         List<Rent> rents = rentService.findAllByReaderId(readerId);
         if (rents.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO));
+    }
+
+    @Override
+    public ResponseEntity<?> findAllFutureByReaderId(UUID readerId) {
+        List<Rent> rents = rentService.findAllFutureByReaderId(readerId);
+        if (rents.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO).toList());
     }
 
     @Override
@@ -69,11 +88,10 @@ public class RentController implements IRentController {
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO).toList());
     }
 
-    @Override
-    public ResponseEntity<?> findAllFutureByReaderId(UUID readerId) {
-        return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
-    }
 
+
+    // By Book
+    @Override
     public ResponseEntity<?> findAllByBookId(UUID readerId) {
         List<Rent> rents = rentService.findAllByBookId(readerId);
         if (rents.isEmpty()) {
@@ -83,8 +101,8 @@ public class RentController implements IRentController {
     }
 
     @Override
-    public ResponseEntity<?> findAllActiveByBookId(UUID bookId) {
-        List<Rent> rents = rentService.findAllActiveByBookId(bookId);
+    public ResponseEntity<?> findAllFutureByBookId(UUID bookId) {
+        List<Rent> rents = rentService.findAllFutureByBookId(bookId);
         if (rents.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -92,8 +110,8 @@ public class RentController implements IRentController {
     }
 
     @Override
-    public ResponseEntity<?> findAllFutureByBookId(UUID bookId) {
-        List<Rent> rents = rentService.findAllFutureByBookId(bookId);
+    public ResponseEntity<?> findAllActiveByBookId(UUID bookId) {
+        List<Rent> rents = rentService.findAllActiveByBookId(bookId);
         if (rents.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -107,5 +125,25 @@ public class RentController implements IRentController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO).toList());
+    }
+
+
+    @Override
+    public ResponseEntity<?> updateRent(UUID id, LocalDateTime endTime) {
+        Rent updatedRent = rentService.updateRent(id, endTime);
+        RentOutputDTO outputDTO = RentMapper.toRentOutputDTO(updatedRent);
+        return ResponseEntity.ok().body(outputDTO);
+    }
+
+    @Override
+    public ResponseEntity<?> endRent(UUID rentId) {
+        rentService.endRent(rentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<?> deleteRent(UUID id) {
+        rentService.deleteRent(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,5 +1,7 @@
 package pl.pas.rest.repositories.implementations;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
@@ -7,8 +9,10 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ValidationOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.springframework.stereotype.Repository;
 import pl.pas.rest.exceptions.rent.RentNotFoundException;
 import pl.pas.rest.mgd.RentMgd;
+import pl.pas.rest.repositories.MyMongoClient;
 import pl.pas.rest.repositories.interfaces.IRentRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
 
@@ -18,11 +22,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-
+@Repository
 public class RentRepository extends ObjectRepository<RentMgd> implements IRentRepository {
 
-    public RentRepository(MongoClient client) {
-        super(client, RentMgd.class);
+    public RentRepository(MyMongoClient client) {
+        super(client.getClient(), RentMgd.class);
 
         boolean collectionActiveExist = getDatabase().listCollectionNames()
                 .into(new ArrayList<>()).contains(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME);
@@ -34,7 +38,21 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
                                     {
                                         $jsonSchema: {
                                             "bsonType": "object",
-                                            "required": ["_id"]
+                                            "required": ["_id", "book", "reader", "beginTime", "endTime"]
+                                            "properties": {
+                                                "book" : {
+                                                    "bsonType" : "object"
+                                                },
+                                                "reader" : {
+                                                    "bsonType" : "object"
+                                                },
+                                                "beginTime" : {
+                                                    "bsonType" : "date"
+                                                },
+                                                "endTime" : {
+                                                    "bsonType" : "date"
+                                                }
+                                            }
                                         }
                                     }
                                     """));
@@ -54,7 +72,21 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
                                     {
                                         $jsonSchema: {
                                             "bsonType": "object",
-                                            "required": ["_id"]
+                                            "required": ["_id", "book", "reader", "beginTime", "endTime"]
+                                            "properties": {
+                                                "book" : {
+                                                    "bsonType" : "object"
+                                                },
+                                                "reader" : {
+                                                    "bsonType" : "object"
+                                                },
+                                                "beginTime" : {
+                                                    "bsonType" : "date"
+                                                },
+                                                "endTime" : {
+                                                    "bsonType" : "date"
+                                                }
+                                            }
                                         }
                                     }
                                     """));
@@ -63,19 +95,6 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
                     .validationOptions(validationOptions);
             super.getDatabase().createCollection(DatabaseConstants.RENT_ARCHIVE_COLLECTION_NAME, createCollectionOptions);
         }
-    }
-
-    @Override
-    public RentMgd save(RentMgd rentMgd) {
-
-        //ClientSession clientSession = super.getClient().startSession();
-        //MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
-        //        .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, RentMgd.class);
-        //
-        //
-        //Bson rentFilter = Filters.eq(DatabaseConstants.ID, rentMgd.getId());
-        //rentMgdMongoCollection.replaceOne(rentFilter, rentMgd, new ReplaceOptions().upsert(true));
-        return super.save(rentMgd);
     }
 
     public void moveRentToArchived(UUID rentId) {
@@ -89,10 +108,10 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
         }
         activeCollection.deleteOne(filter);
 
-        MongoCollection<RentMgd> archiveCollection = super.getDatabase()
+        MongoCollection<RentMgd> archivedCollection = super.getDatabase()
                 .getCollection(DatabaseConstants.RENT_ARCHIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
 
-        archiveCollection.insertOne(rentMgd);
+        archivedCollection.insertOne(rentMgd);
     }
 
 
@@ -249,4 +268,30 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
         .toList();
     }
 
+    @Override
+    public RentMgd findAllActiveOrFutureByRentId(UUID rentId) {
+        MongoCollection<RentMgd> rentMgdMongoCollection = super.getDatabase()
+                .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME, DatabaseConstants.RENT_COLLECTION_TYPE);
+        Bson filter = Filters.eq(DatabaseConstants.ID, rentId);
+        return rentMgdMongoCollection.find(filter).first();
+    }
+
+
+    @Override
+    public void deleteAll() {
+        MongoCollection<Document> collection = super.getDatabase()
+                .getCollection(DatabaseConstants.RENT_ACTIVE_COLLECTION_NAME);
+
+        FindIterable<Document> findIterable = collection.find();
+        for (Document document : findIterable) {
+            collection.deleteMany(document);
+        }
+
+        collection = super.getDatabase()
+                .getCollection(DatabaseConstants.RENT_ARCHIVE_COLLECTION_NAME);
+        FindIterable<Document> archived = collection.find();
+        for (Document document : archived) {
+            collection.deleteMany(document);
+        }
+    }
 }

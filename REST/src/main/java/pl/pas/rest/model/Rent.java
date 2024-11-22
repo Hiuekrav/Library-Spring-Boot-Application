@@ -8,7 +8,7 @@ import pl.pas.rest.model.users.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-@SuperBuilder(toBuilder = true)
+
 @Getter @Setter
 public class Rent extends AbstractEntity {
 
@@ -41,6 +41,14 @@ public class Rent extends AbstractEntity {
 
     public Rent(UUID id, LocalDateTime endTime, User reader, Book book) {
         super(id);
+        this.beginTime = LocalDateTime.now();
+        this.endTime = endTime;
+        this.reader = reader;
+        this.book = book;
+    }
+
+    public Rent(LocalDateTime endTime, User reader, Book book) {
+        super(null);
         this.beginTime = LocalDateTime.now();
         this.endTime = endTime;
         this.reader = reader;

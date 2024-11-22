@@ -16,7 +16,11 @@ public interface IBookService extends IObjectService {
 
     List<Book> findAll();
 
-    Book updateBook(BookUpdateDTO updateDTO);
+    Book updateBook(UUID id, BookUpdateDTO updateDTO);
 
-    void removeBook(UUID vehicleId);
+    void deleteBook(UUID vehicleId);
+
+    void changeArchiveStatus(UUID id, Boolean archived);
+
+    void deleteAll();
 }

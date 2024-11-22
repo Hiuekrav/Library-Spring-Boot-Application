@@ -33,6 +33,11 @@ public class AdminMgd extends UserMgd {
         super(id, firstName, lastName, email, password, cityName, streetName, streetNumber);
     }
 
+    public AdminMgd (String firstName, String lastName, String email, String password,
+                     String cityName, String streetName, String streetNumber) {
+        super(null, firstName, lastName, email, password, cityName, streetName, streetNumber);
+    }
+
     public AdminMgd(User user) {
         super(user);
     }

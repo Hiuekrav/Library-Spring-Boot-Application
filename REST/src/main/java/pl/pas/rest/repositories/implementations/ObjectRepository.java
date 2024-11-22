@@ -1,12 +1,10 @@
 package pl.pas.rest.repositories.implementations;
 
-import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import lombok.Getter;
-import org.bson.Document;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
@@ -16,6 +14,7 @@ import pl.pas.rest.mgd.*;
 import pl.pas.rest.mgd.users.UserMgd;
 import pl.pas.rest.repositories.interfaces.IObjectRepository;
 import pl.pas.rest.utils.consts.DatabaseConstants;
+import pl.pas.rest.utils.consts.I18n;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -60,14 +59,13 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         List<Bson> updates = new ArrayList<>();
         List<Field> fieldList = new ArrayList<>();
         getAllFields(fieldList, modifiedDoc.getClass());
-
         for (Field field : fieldList) {
             field.setAccessible(true);
             Object value;
             try {
                 value = field.get(modifiedDoc);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException("IllegalAccessException!! "+ e);
+                throw new ApplicationBaseException(I18n.APPLICATION_DATABASE_EXCEPTION);
             }
             if (value != null) {
                 updates.add(Updates.set(field.getAnnotation(BsonProperty.class).value(), value));
@@ -77,16 +75,6 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
         return Updates.combine(updates);
     }
 
-//    @Override
-//    public T findByIdOrNull(UUID id) {
-//        try {
-//            MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
-//            Bson filter = Filters.eq(DatabaseConstants.ID, id);
-//            return collection.find(filter).first();
-//        } catch (MongoCommandException e) {
-//            throw new ApplicationDatabaseException(e);
-//        }
-//    }
     @Override
     public T findByIdOrNull(UUID id) {
         MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
@@ -96,32 +84,22 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
 
     @Override
     public T findById(UUID id) {
-        try {
-            MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
-            Bson filter = Filters.eq(DatabaseConstants.ID, id);
-            return collection.find(filter).first();
-        } catch (MongoCommandException e) {
-            throw new ApplicationDatabaseException(e.getMessage());
-        }
+        MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
+        Bson filter = Filters.eq(DatabaseConstants.ID, id);
+        return collection.find(filter).first();
     }
 
     @Override
     public List<T> findAll() {
-        ClientSession clientSession = this.getClient().startSession();
-        try {
-            MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
-            return collection.find().into(new ArrayList<>());
-        } catch (MongoCommandException e) {
-            clientSession.close();
-            throw new ApplicationDatabaseException(e.getMessage());
-        }
+        MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
+        return collection.find().into(new ArrayList<>());
     }
 
     @Override
     public T save(T object) {
-        T foundObject = findByIdOrNull(object.getId());
-        if (foundObject == null) {
+        if (object.getId() == null) {
             // ID not found - create operation
+            object.setId(UUID.randomUUID());
             List<Field> fieldList = new ArrayList<>();
             getAllFields(fieldList, object.getClass());
             fieldList.removeIf( (field)-> Objects.equals(field.getAnnotation(BsonProperty.class).value(), DatabaseConstants.BOOK_RENTED));
@@ -131,11 +109,11 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
                             field.setAccessible(true);
                             return field.get(object) == null;
                         } catch (IllegalAccessException e) {
-                            throw new ApplicationBaseException(e);
+                            throw new ApplicationBaseException(I18n.APPLICATION_ILLEGAL_ACCESS_EXCEPTION);
                         }
                     });
             if (nullFields) {
-                throw new ApplicationDatabaseException("Tried to save null values!!!");
+                throw new ApplicationDatabaseException(I18n.OBJECT_SAVE_NULL_VALUES_EXCEPTION);
             }
             MongoCollection<T> docCollection = this.database.getCollection(collectionName, mgdClass);
             docCollection.insertOne(object);
@@ -146,22 +124,23 @@ public abstract class ObjectRepository<T extends AbstractEntityMgd> implements I
             Bson combinedUpdates = this.updateFields(object);
             MongoCollection<T> docCollection = this.database.getCollection(collectionName, mgdClass);
             docCollection.updateOne(filter, combinedUpdates);
-            return docCollection.find(filter).first();
+            if(docCollection.find(filter).first() != null) {
+                return docCollection.find(filter).first();
+            }
+            else{
+                throw new ApplicationDatabaseException(I18n.DATABASE_SAVE_FAILURE_EXCEPTION);
+            }
         }
     }
 
     @Override
     public void deleteById(UUID id) {
-        try {
-            MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
-            Bson filter = Filters.eq(DatabaseConstants.ID, id);
-            DeleteResult result = collection.deleteOne(filter);
+        MongoCollection<T> collection = this.database.getCollection(collectionName, mgdClass);
+        Bson filter = Filters.eq(DatabaseConstants.ID, id);
+        DeleteResult result = collection.deleteOne(filter);
 
-            if (result.getDeletedCount() == 0) {
-                throw new ApplicationDatabaseException("Object with provided ID not found!");
-            }
-        } catch (MongoCommandException e) {
-            throw new ApplicationDatabaseException("Error deleting client", e);
+        if (result.getDeletedCount() == 0) {
+            throw new ApplicationDatabaseException(I18n.DELETE_OBJECT_NOT_FOUND);
         }
     }
 

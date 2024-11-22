@@ -14,22 +14,25 @@ import java.util.UUID;
 public interface IUserController {
 
     @PostMapping(value = "create-admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createAdmin(@RequestBody UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createAdmin(@Valid @RequestBody UserCreateDTO userCreateDTO);
 
     @PostMapping(value = "create-librarian", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createLibrarian(@RequestBody @Valid  UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createLibrarian(@Valid @RequestBody UserCreateDTO userCreateDTO);
 
     @PostMapping(value = "create-reader", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createReader(@RequestBody @Valid UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createReader(@Valid @RequestBody  UserCreateDTO userCreateDTO);
 
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> findById(@PathVariable UUID id);
 
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> findByEmail(@RequestParam("email") String email);
+
     @GetMapping(value = "all", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> findAll();
 
-    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> updateUser(@RequestBody UserUpdateDTO userUpdateDTO);
+    @PostMapping(value = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> updateUser(@PathVariable("id") UUID id, @Valid @RequestBody UserUpdateDTO userUpdateDTO);
 
     @PostMapping(value = "{id}/activate")
     ResponseEntity<?> activateUser(@PathVariable UUID id);

@@ -9,13 +9,11 @@ import pl.pas.dto.create.UserCreateDTO;
 import pl.pas.dto.output.UserOutputDTO;
 import pl.pas.dto.update.UserUpdateDTO;
 import pl.pas.rest.controllers.interfaces.IUserController;
-import pl.pas.rest.model.users.Admin;
+import pl.pas.rest.exceptions.ApplicationDataIntegrityException;
 import pl.pas.rest.model.users.User;
-import pl.pas.rest.repositories.implementations.UserRepository;
-import pl.pas.rest.repositories.interfaces.IUserRepository;
 import pl.pas.rest.services.interfaces.IUserService;
-import pl.pas.rest.utils.consts.DatabaseConstants;
 import pl.pas.rest.utils.consts.GeneralConstants;
+import pl.pas.rest.utils.consts.I18n;
 import pl.pas.rest.utils.mappers.UserMapper;
 
 import java.net.URI;
@@ -60,18 +58,26 @@ public class UserController implements IUserController {
     }
 
     @Override
+    public ResponseEntity<?> findByEmail(String email) {
+        List<User> user = userService.findByEmail(email);
+        List<UserOutputDTO> outputDTOList = user.stream().map(UserMapper::toUserOutputDTO).toList();
+        return ResponseEntity.ok().body(outputDTOList);
+    }
+
+    @Override
     public ResponseEntity<?> findAll() {
         List<User> users = userService.findAll();
-
         if(users.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.ok().body(users.stream().map(UserMapper::toUserOutputDTO).toList());
     }
 
     @Override
-    public ResponseEntity<?> updateUser(UserUpdateDTO userUpdateDTO) {
+    public ResponseEntity<?> updateUser(UUID id, UserUpdateDTO userUpdateDTO) {
+        if (!userUpdateDTO.id().equals(id)) {
+            throw new ApplicationDataIntegrityException(I18n.UPDATE_ID_DO_NOT_MATCH);
+        }
         User updatedUser = userService.updateUser(userUpdateDTO);
         UserOutputDTO outputDTO = UserMapper.toUserOutputDTO(updatedUser);
         return ResponseEntity.ok().body(outputDTO);

@@ -3,21 +3,15 @@ package pl.pas.rest.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import pl.pas.dto.Genre;
 import pl.pas.rest.mgd.BookMgd;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
-@SuperBuilder(toBuilder = true)
+
 @Getter @Setter
 public class Book extends AbstractEntity {
-
-    public enum Genre {
-        FANTASY,
-        THRILLER,
-        ROMANCE,
-        HORROR
-    }
 
     private String title;
     private String author;

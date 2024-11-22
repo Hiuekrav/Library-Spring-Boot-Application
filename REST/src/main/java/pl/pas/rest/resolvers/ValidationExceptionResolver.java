@@ -14,7 +14,6 @@ import java.util.Map;
 @ControllerAdvice
 public class ValidationExceptionResolver {
 
-    @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(
             MethodArgumentNotValidException ex) {

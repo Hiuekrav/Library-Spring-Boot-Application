@@ -3,7 +3,7 @@ package pl.pas.rest.exceptions.book;
 import pl.pas.rest.exceptions.ApplicationBaseException;
 import pl.pas.rest.utils.consts.I18n;
 
-public class BookTitleAlreadyExistException extends ApplicationBaseException {
+public class BookTitleAlreadyExistException extends BookBaseException {
 
     public BookTitleAlreadyExistException(String message) {
         super(message);
