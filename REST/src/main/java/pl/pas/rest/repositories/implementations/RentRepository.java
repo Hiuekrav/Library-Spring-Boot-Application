@@ -155,9 +155,6 @@ public class RentRepository extends ObjectRepository<RentMgd> implements IRentRe
 
         Bson filter = Filters.eq(DatabaseConstants.ID, id);
         RentMgd rentMgd = rentMgdMongoCollection.find(filter).first();
-        if (rentMgd == null) {
-            throw new RentNotFoundException();
-        }
         return rentMgd;
     }
 

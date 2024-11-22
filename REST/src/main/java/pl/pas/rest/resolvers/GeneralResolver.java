@@ -1,5 +1,6 @@
 package pl.pas.rest.resolvers;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -9,6 +10,7 @@ import pl.pas.rest.exceptions.ApplicationDatabaseException;
 
 import java.util.Arrays;
 
+@Order(20)
 @ControllerAdvice
 public class GeneralResolver {
 

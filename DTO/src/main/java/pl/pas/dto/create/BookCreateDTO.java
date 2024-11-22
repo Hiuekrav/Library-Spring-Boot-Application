@@ -2,6 +2,7 @@ package pl.pas.dto.create;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import pl.pas.dto.Genre;
 import pl.pas.dto.ValidationConstants;
 

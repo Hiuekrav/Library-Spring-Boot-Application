@@ -14,13 +14,13 @@ import java.util.UUID;
 public interface IUserController {
 
     @PostMapping(value = "create-admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createAdmin(@Valid @RequestBody UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createAdmin(@RequestBody @Valid  UserCreateDTO userCreateDTO);
 
     @PostMapping(value = "create-librarian", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createLibrarian(@Valid @RequestBody UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createLibrarian( @RequestBody @Valid UserCreateDTO userCreateDTO);
 
     @PostMapping(value = "create-reader", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createReader(@Valid @RequestBody  UserCreateDTO userCreateDTO);
+    ResponseEntity<?> createReader( @RequestBody @Valid  UserCreateDTO userCreateDTO);
 
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> findById(@PathVariable UUID id);

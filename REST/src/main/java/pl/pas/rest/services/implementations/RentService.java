@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import pl.pas.dto.create.RentCreateDTO;
 import pl.pas.dto.create.RentCreateShortDTO;
 import pl.pas.rest.exceptions.book.BookArchivedException;
+import pl.pas.rest.exceptions.book.BookNotFoundException;
 import pl.pas.rest.exceptions.rent.RentCreationException;
 import pl.pas.rest.exceptions.rent.RentDeleteException;
 import pl.pas.rest.exceptions.rent.RentInvalidTimeException;
@@ -67,20 +68,21 @@ public class RentService extends ObjectService implements IRentService {
 
         BookMgd foundBook = bookRepository.findById(createRentDTO.bookId());
 
-        if (createRentDTO.beginTime().isBefore(LocalDateTime.now())) {
+        if (createRentDTO.beginTime().isBefore(LocalDateTime.now().minusMinutes(1))) {
             throw new RentInvalidTimeException();
         }
 
         Rent rent = new Rent(
+                createRentDTO.beginTime(),
                 createRentDTO.endTime(),
                 new User(foundReader),
                 new Book(foundBook)
         );
         RentMgd rentMgd = new RentMgd(rent, foundReader, foundBook);
-        rentRepository.save(rentMgd);
+        RentMgd savedRent = rentRepository.save(rentMgd);
         clientSession.commitTransaction();
         clientSession.close();
-        return rent;
+        return new Rent(savedRent, new User(foundReader), new Book(foundBook));
 
     }
 
@@ -108,7 +110,7 @@ public class RentService extends ObjectService implements IRentService {
 
         LocalDateTime maxEndTime = rentRepository
                 .findAllFutureByBookId(foundBook.getId()).stream()
-                .map(RentMgd::getBeginTime).min(Comparator.naturalOrder()).orElse(LocalDateTime.MAX);
+                .map(RentMgd::getBeginTime).min(Comparator.naturalOrder()).orElse(LocalDateTime.now().plusDays(1));
 
         Rent rent = new Rent(
                 maxEndTime.minusMinutes(1),
@@ -116,10 +118,11 @@ public class RentService extends ObjectService implements IRentService {
                 new Book(foundBook)
         );
         RentMgd rentMgd = new RentMgd(rent, foundReader, foundBook);
-        rentRepository.save(rentMgd);
+        RentMgd savedRent = rentRepository.save(rentMgd);
         session.commitTransaction();
+
         session.close();
-        return rent;
+        return new Rent(savedRent, new User(foundReader), new Book(foundBook));
     }
 
 
@@ -281,14 +284,14 @@ public class RentService extends ObjectService implements IRentService {
         LocalDateTime beginTime = rentMgd.getBeginTime();
         LocalDateTime endTime = rentMgd.getEndTime();
         if (LocalDateTime.now().isAfter(beginTime) && LocalDateTime.now().isBefore(endTime)
-                && rentMgd.getBookMgd().getRented() != 1) {
+                && (rentMgd.getBookMgd().getRented() != 1 )) {
             this.bookRepository.changeRentedStatus(rentMgd.getBookMgd().getId(), true);
-            rentMgd.getBookMgd().setRented(1);
+            //rentMgd.getBookMgd().setRented(1);
         }
         else if (LocalDateTime.now().isAfter(endTime)
-                &&rentMgd.getBookMgd().getRented() != 0) {
+                && (rentMgd.getBookMgd().getRented() != 0) ) {
             this.bookRepository.changeRentedStatus(rentMgd.getBookMgd().getId(), false);
-            rentMgd.getBookMgd().setRented(0);
+            //rentMgd.getBookMgd().setRented(0);
             rentRepository.save(rentMgd);
             rentRepository.moveRentToArchived(rentMgd.getId());
         }
@@ -304,6 +307,8 @@ public class RentService extends ObjectService implements IRentService {
         }
 
         ClientSession session = super.getClient().startSession();
+        session.startTransaction();
+        rentMgd = rentRepository.findById(id);
         rentRepository.deleteById(id);
         bookRepository.changeRentedStatus(rentMgd.getBookMgd().getId(), false);
         session.commitTransaction();

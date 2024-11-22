@@ -15,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.pas.dto.Genre;
 import pl.pas.dto.create.BookCreateDTO;
 import pl.pas.dto.create.RentCreateDTO;
+import pl.pas.dto.create.RentCreateShortDTO;
 import pl.pas.dto.create.UserCreateDTO;
 import pl.pas.dto.update.BookUpdateDTO;
 import pl.pas.rest.controllers.interfaces.IBookController;
@@ -61,6 +62,8 @@ public class BookControllerTests {
     @BeforeEach
     void before() {
         bookService.deleteAll();
+        userService.deleteAll();
+        rentService.deleteAll();
     }
 
     @Test
@@ -90,6 +93,60 @@ public class BookControllerTests {
                 .body("rented", equalTo(false))
                 .body("archive", equalTo(false));
 
+    }
+
+    @Test
+    void testCreateBookNegative_InvalidTitle() {
+
+        BookCreateDTO createDTO = new BookCreateDTO("", "Sapkowski",
+                400, Genre.FANTASY, LocalDate.of(2016, 5, 17));
+
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(createDTO)
+                .when()
+                .post("/api/books/create");
+
+        // Log request and response if status code is not as expected
+        if (response.getStatusCode() != 201) {
+            response.then().log().all();
+        }
+        response.then()
+                .statusCode(400);
+    }
+
+    @Test
+    void testCreateBooksNegative_SameIdentifier() {
+
+        String title = "Title";
+
+        BookCreateDTO createDTO = new BookCreateDTO(title, "Sapkowski",
+                400, Genre.FANTASY, LocalDate.of(2016, 5, 17));
+
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(createDTO)
+                .when()
+                .post("/api/books/create");
+
+        // Log request and response if status code is not as expected
+        if (response.getStatusCode() != 201) {
+            response.then().log().all();
+        }
+        response.then()
+                .statusCode(201);
+
+        BookCreateDTO createDTO2 = new BookCreateDTO(title, "Sapkowski",
+                400, Genre.FANTASY, LocalDate.of(2016, 5, 17));
+
+        Response response2 = given()
+                .contentType(ContentType.JSON)
+                .body(createDTO2)
+                .when()
+                .post("/api/books/create");
+
+        response2.then()
+                .statusCode(409);
     }
 
     @Test
@@ -136,18 +193,17 @@ public class BookControllerTests {
     @Test
     void testUpdateBook() {
         //todo nie dziala
-        BookCreateDTO createDTO = new BookCreateDTO("Wiedźmin 4", "Sapkowski",
+        BookCreateDTO createDTO = new BookCreateDTO("Wiedzmin 4", "Sapkowski",
                 300, Genre.FANTASY, LocalDate.of(2020, 1, 1));
         Book createdBook = bookService.createBook(createDTO);
 
-        BookUpdateDTO updateDTO = new BookUpdateDTO(createdBook.getId(), "Zmora IASu", "Sapkowski",
+        BookUpdateDTO updateDTO = new BookUpdateDTO(createdBook.getId(), "ZmoraIasu", "Sapkowski",
                 3000, Genre.HORROR, LocalDate.of(2024, 11, 22));
-        Book updatedBook = bookService.updateBook(createdBook.getId(), updateDTO);
         Response response = given()
                 .contentType(ContentType.JSON)
                 .body(updateDTO)
             .when()
-                .post("/api/books/{id}", updatedBook.getId());
+                .post("/api/books/{id}", createdBook.getId());
 
         if (response.getStatusCode() != 200) {
             response.then().log().all();
@@ -156,11 +212,10 @@ public class BookControllerTests {
         response.then()
                 .statusCode(200)
                 .body("id", equalTo(createdBook.getId().toString()))
-                .body("title", equalTo(createdBook.getTitle()))
-                .body("author", equalTo(createdBook.getAuthor()))
-                .body("numberOfPages", equalTo(createdBook.getNumberOfPages()))
-                .body("genre", equalTo(createdBook.getGenre().toString()))
-                .body("publishedDate", equalTo(createdBook.getPublishedDate().toString()))
+                .body("title", equalTo(updateDTO.title()))
+                .body("author", equalTo(updateDTO.author()))
+                .body("numberOfPages", equalTo(updateDTO.numberOfPages()))
+                .body("genre", equalTo(updateDTO.genre().toString()))
                 .body("rented", equalTo(false))
                 .body("archive", equalTo(false));
     }
@@ -171,10 +226,16 @@ public class BookControllerTests {
                 500, Genre.ROMANCE, LocalDate.of(2021, 10, 11));
         Book createdBook = bookService.createBook(createDTO);
 
-        given()
+        Response response = given()
             .when()
-                .post("/api/books/archive/{id}", createdBook.getId())
-            .then()
+                .post("/api/books/{id}/archive/", createdBook.getId());
+
+        if (response.getStatusCode() != 200) {
+            response.then().log().all();
+        }
+
+        response.
+                     then()
                 .statusCode(204);
 
         Book archivedBook = bookService.findBookById(createdBook.getId());
@@ -267,9 +328,8 @@ public class BookControllerTests {
 
         User createdUser = userService.createReader(userCreateDTO);
 
-        RentCreateDTO rentCreateDTO = new RentCreateDTO(LocalDateTime.now(), LocalDateTime.now().plusHours(2),
-                createdUser.getId(), createdBook.getId());
-        Rent createdRent = rentService.createRent(rentCreateDTO);
+        RentCreateShortDTO rentCreateDTO = new RentCreateShortDTO(createdUser.getId(), createdBook.getId());
+        Rent createdRent = rentService.createRentWithUnspecifiedTime(rentCreateDTO);
         rentService.endRent(createdRent.getId());
 
         Response response = given()

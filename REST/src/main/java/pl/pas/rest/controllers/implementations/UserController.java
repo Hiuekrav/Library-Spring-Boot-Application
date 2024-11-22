@@ -30,7 +30,7 @@ public class UserController implements IUserController {
     private final String userCreateURL = GeneralConstants.APPLICATION_CONTEXT + "/users/%s";
 
     @Override
-    public ResponseEntity<?> createAdmin(@Valid @RequestBody UserCreateDTO userCreateDTO) {
+    public ResponseEntity<?> createAdmin(UserCreateDTO userCreateDTO) {
         User createdUser = userService.createAdmin(userCreateDTO);
         UserOutputDTO outputDTO = UserMapper.toUserOutputDTO(createdUser);
         return ResponseEntity.created(URI.create(userCreateURL.formatted(createdUser.getId()))).body(outputDTO);

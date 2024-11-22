@@ -1,6 +1,7 @@
 package pl.pas.rest.resolvers;
 
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.pas.dto.output.ExceptionOutputDTO;
 import pl.pas.rest.exceptions.book.*;
 
+@Order(2)
 @ControllerAdvice
 public class BookExceptionResolver {
 
@@ -19,7 +21,7 @@ public class BookExceptionResolver {
     }
 
     @ExceptionHandler(value = {BookChangeStatusException.class, BookTitleAlreadyExistException.class})
-    public ResponseEntity<?> handleBookChangeStatusException(BookChangeStatusException e) {
+    public ResponseEntity<?> handleBookChangeStatusException(BookBaseException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionOutputDTO(e.getMessage()));
     }
 }

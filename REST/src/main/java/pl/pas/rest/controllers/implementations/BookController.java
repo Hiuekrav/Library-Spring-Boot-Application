@@ -57,6 +57,7 @@ public class BookController implements IBookController {
     @Override
     public ResponseEntity<?> updateBook(UUID id, BookUpdateDTO bookUpdateDTO) {
         Book updatedBook = bookService.updateBook(id, bookUpdateDTO);
+        System.out.println(">>>>>End of updateFunction");
         BookOutputDTO outputDTO = BookMapper.toBookOutputDTO(updatedBook);
         System.out.println(">>>>>End of controller");
         return ResponseEntity.ok().body(outputDTO);

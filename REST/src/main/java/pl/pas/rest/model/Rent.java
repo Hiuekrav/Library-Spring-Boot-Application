@@ -47,6 +47,14 @@ public class Rent extends AbstractEntity {
         this.book = book;
     }
 
+    public Rent(LocalDateTime beginTime, LocalDateTime endTime, User reader, Book book) {
+        super(null);
+        this.beginTime = beginTime;
+        this.endTime = endTime;
+        this.reader = reader;
+        this.book = book;
+    }
+
     public Rent(LocalDateTime endTime, User reader, Book book) {
         super(null);
         this.beginTime = LocalDateTime.now();

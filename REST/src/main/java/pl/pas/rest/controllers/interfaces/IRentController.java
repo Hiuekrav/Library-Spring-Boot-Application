@@ -23,7 +23,7 @@ public interface IRentController {
     @GetMapping("all")
     ResponseEntity<?> findAllRents();
 
-    @GetMapping(value = "rent/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> findById(@PathVariable("id") UUID id);
 
     @GetMapping("reader/{id}/all")

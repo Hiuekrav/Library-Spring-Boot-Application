@@ -110,6 +110,7 @@ public class BookService extends ObjectService implements IBookService {
         clientSession.commitTransaction();
         System.out.println(">>>>> Book updated!!!!");
         clientSession.close();
+        System.out.println(">>>>> Session closed!!!!");
         return new Book(bookMgd);
     }
 

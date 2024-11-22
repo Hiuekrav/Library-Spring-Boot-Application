@@ -3,7 +3,7 @@ package pl.pas.rest.exceptions.book;
 import pl.pas.rest.exceptions.ApplicationBaseException;
 import pl.pas.rest.utils.consts.I18n;
 
-public class BookNotFoundException extends ApplicationBaseException {
+public class BookNotFoundException extends BookBaseException {
 
     public BookNotFoundException() {
         super(I18n.BOOK_NOT_FOUND_EXCEPTION);

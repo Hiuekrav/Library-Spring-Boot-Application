@@ -1,5 +1,6 @@
 package pl.pas.rest.services.implementations;
 
+import com.mongodb.MongoWriteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pas.dto.create.UserCreateDTO;
@@ -54,8 +55,12 @@ public class UserService extends ObjectService implements IUserService {
                 createDTO.streetName(),
                 createDTO.streetNumber()
         );
-
-        UserMgd createdUser = userRepository.save(userMgd);
+        UserMgd createdUser;
+        try {
+            createdUser = userRepository.save(userMgd);
+        }catch (MongoWriteException e) {
+            throw new EmailAlreadyExistException();
+        }
         return new User(createdUser);
     }
 
@@ -79,7 +84,12 @@ public class UserService extends ObjectService implements IUserService {
                 createDTO.streetNumber()
         );
 
-        UserMgd createdUser = userRepository.save(librarianMgd);
+        UserMgd createdUser;
+        try {
+            createdUser = userRepository.save(librarianMgd);
+        }catch (MongoWriteException e) {
+            throw new EmailAlreadyExistException();
+        }
         return new User(createdUser);
     }
 
@@ -103,7 +113,12 @@ public class UserService extends ObjectService implements IUserService {
                 createDTO.streetNumber()
         );
 
-        UserMgd createdUser = userRepository.save(readerMgd);
+        UserMgd createdUser;
+        try {
+            createdUser = userRepository.save(readerMgd);
+        }catch (MongoWriteException e) {
+            throw new EmailAlreadyExistException();
+        }
         return new User(createdUser);
     }
 

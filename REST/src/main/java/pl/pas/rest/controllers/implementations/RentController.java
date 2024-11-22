@@ -27,13 +27,15 @@ public class RentController implements IRentController {
 
     public ResponseEntity<?> createRent(RentCreateDTO rentCreateDTO) {
         Rent rent = rentService.createRent(rentCreateDTO);
-        return ResponseEntity.created(URI.create(rentCreatedURI.formatted(rent.getId()))).body(rent);
+        return ResponseEntity.created(URI.create(rentCreatedURI.formatted(rent.getId())))
+                .body(RentMapper.toRentOutputDTO(rent));
     }
 
     @Override
     public ResponseEntity<?> createRentNow(RentCreateShortDTO rentCreateShortDTO) {
         Rent rent = rentService.createRentWithUnspecifiedTime(rentCreateShortDTO);
-        return ResponseEntity.created(URI.create(rentCreatedURI.formatted(rent.getId()))).body(rent);
+        return ResponseEntity.created(URI.create(rentCreatedURI.formatted(rent.getId())))
+                .body(RentMapper.toRentOutputDTO(rent));
     }
 
     // By Rent
