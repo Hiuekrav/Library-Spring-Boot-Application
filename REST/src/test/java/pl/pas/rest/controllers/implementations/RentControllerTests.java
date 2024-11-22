@@ -10,12 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.pas.dto.Genre;
 import pl.pas.dto.create.BookCreateDTO;
 import pl.pas.dto.create.RentCreateDTO;
 import pl.pas.dto.create.RentCreateShortDTO;
 import pl.pas.dto.create.UserCreateDTO;
+import pl.pas.dto.update.RentUpdateDTO;
 import pl.pas.rest.model.Book;
 import pl.pas.rest.model.Rent;
 import pl.pas.rest.model.users.User;
@@ -32,7 +34,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles("Test")
 class RentControllerTests {
 
     static String bazeURI;
@@ -539,8 +542,34 @@ class RentControllerTests {
 
     @Test
     void updateRent() {
+        BookCreateDTO createDTO = new BookCreateDTO("Wiedźmin 10", "Sapkowski",
+                400, Genre.FANTASY, LocalDate.of(2017, 5, 17));
+        Book createdBook = bookService.createBook(createDTO);
 
+        UserCreateDTO userCreateDTO = new UserCreateDTO("Jan", "Nowak","jannowak77@gmail.com",
+                "passsword","Lodz", "Ulicowa", "12");
 
+        User createdUser = userService.createReader(userCreateDTO);
+
+        RentCreateDTO rentCreateDTO = new RentCreateDTO(LocalDateTime.now().plusMinutes(1), LocalDateTime.now().plusHours(2),
+                createdUser.getId(), createdBook.getId());
+        Rent rent = rentService.createRent(rentCreateDTO);
+
+        RentUpdateDTO updateDTO = new RentUpdateDTO(rent.getId(), LocalDateTime.now().plusHours(4));
+
+        Response response = given()
+                .contentType(ContentType.JSON)
+            .when()
+                .body(updateDTO)
+                .post("/api/rents/{id}", rent.getId());
+
+        if (response.getStatusCode() != 200) {
+            response.then().log().all();
+        }
+
+        response
+            .then()
+                .statusCode(200);
     }
 
     @Test

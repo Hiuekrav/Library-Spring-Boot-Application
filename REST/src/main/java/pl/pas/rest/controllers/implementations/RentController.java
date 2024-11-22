@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pas.dto.create.RentCreateDTO;
 import pl.pas.dto.create.RentCreateShortDTO;
 import pl.pas.dto.output.RentOutputDTO;
+import pl.pas.dto.update.RentUpdateDTO;
 import pl.pas.rest.controllers.interfaces.IRentController;
 import pl.pas.rest.model.Rent;
 import pl.pas.rest.services.interfaces.IRentService;
@@ -131,8 +132,9 @@ public class RentController implements IRentController {
 
 
     @Override
-    public ResponseEntity<?> updateRent(UUID id, LocalDateTime endTime) {
-        Rent updatedRent = rentService.updateRent(id, endTime);
+    public ResponseEntity<?> updateRent(UUID id, RentUpdateDTO updateDTO) {
+
+        Rent updatedRent = rentService.updateRent(id, updateDTO);
         RentOutputDTO outputDTO = RentMapper.toRentOutputDTO(updatedRent);
         return ResponseEntity.ok().body(outputDTO);
     }

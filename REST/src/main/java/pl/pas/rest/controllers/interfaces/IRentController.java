@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pas.dto.create.RentCreateDTO;
 import pl.pas.dto.create.RentCreateShortDTO;
+import pl.pas.dto.update.RentUpdateDTO;
 import pl.pas.rest.utils.consts.GeneralConstants;
 
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ public interface IRentController {
     ResponseEntity<?> findAllFutureByBookId(@PathVariable("id") UUID bookId);
 
     @PostMapping("{id}")
-    ResponseEntity<?> updateRent(@PathVariable("id") UUID id, LocalDateTime endTime);
+    ResponseEntity<?> updateRent(@PathVariable("id") UUID id, @Valid @RequestBody RentUpdateDTO endTime);
 
     @PostMapping("/{id}/end")
     ResponseEntity<?> endRent(@PathVariable("id") UUID rentId);

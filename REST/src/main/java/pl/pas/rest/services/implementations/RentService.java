@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pas.dto.create.RentCreateDTO;
 import pl.pas.dto.create.RentCreateShortDTO;
+import pl.pas.dto.update.RentUpdateDTO;
+import pl.pas.rest.exceptions.ApplicationDataIntegrityException;
 import pl.pas.rest.exceptions.book.BookArchivedException;
 import pl.pas.rest.exceptions.book.BookNotFoundException;
 import pl.pas.rest.exceptions.rent.RentCreationException;
@@ -240,8 +242,12 @@ public class RentService extends ObjectService implements IRentService {
 
 
     @Override
-    public Rent updateRent(UUID id, LocalDateTime endTime) {
-        RentMgd rentMgd = rentRepository.findActiveById(id);
+    public Rent updateRent(UUID id, RentUpdateDTO updateDTO) {
+        if (!id.equals(updateDTO.id())) {
+            throw new ApplicationDataIntegrityException();
+        }
+        LocalDateTime endTime = updateDTO.endTime();
+        RentMgd rentMgd = rentRepository.findAllActiveOrFutureByRentId(id);
         BookMgd bookMgd = bookRepository.findById(rentMgd.getBookMgd().getId());
         UserMgd userMgd = userRepository.findById(rentMgd.getReader().getId());
 

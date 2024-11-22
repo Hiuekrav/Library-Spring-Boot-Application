@@ -6,12 +6,13 @@ public class RentDeleteException extends RentBaseException {
     public RentDeleteException() {
         super(I18n.RENT_PRESENT_IN_ARCHIVED);
     }
-    public RentDeleteException(Throwable cause) {
-        super(I18n.RENT_PRESENT_IN_ARCHIVED, cause);
-    }
     public RentDeleteException(String message) {
         super(message);
     }
-    public RentDeleteException(String message, Throwable cause) {}
-
+    public RentDeleteException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    public RentDeleteException(Throwable cause) {
+        super(I18n.RENT_PRESENT_IN_ARCHIVED, cause );
+    }
 }

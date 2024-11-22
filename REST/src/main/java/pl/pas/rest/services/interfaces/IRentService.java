@@ -3,6 +3,7 @@ package pl.pas.rest.services.interfaces;
 import com.mongodb.client.MongoClient;
 import pl.pas.dto.create.RentCreateDTO;
 import pl.pas.dto.create.RentCreateShortDTO;
+import pl.pas.dto.update.RentUpdateDTO;
 import pl.pas.rest.model.Rent;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ public interface IRentService extends IObjectService {
 
     List<Rent> findAllFutureByBookId(UUID bookId);
 
-    Rent updateRent(UUID id, LocalDateTime endTime);
+    Rent updateRent(UUID id, RentUpdateDTO rentUpdateDTO);
 
     void endRent(UUID id);
 

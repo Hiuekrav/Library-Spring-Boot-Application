@@ -41,4 +41,6 @@ public class ValidationConstants {
     public static final String NUMBER_OF_PAGES_BLANK = "book.number.of.pages.blank";
     public static final String GENRE_BLANK = "book.genre.blank";
     public static final String PUBLISHED_DATE_BLANK = "book.published.date.blank";
+
+    public static final String RENT_ID_BLANK = "rent.id.blank";
 }
