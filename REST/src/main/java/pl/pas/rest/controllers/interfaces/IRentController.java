@@ -51,7 +51,7 @@ public interface IRentController {
     @GetMapping("book/{id}/future")
     ResponseEntity<?> findAllFutureByBookId(@PathVariable("id") UUID bookId);
 
-    @PostMapping("{id}")
+    @PutMapping("{id}")
     ResponseEntity<?> updateRent(@PathVariable("id") UUID id, @Valid @RequestBody RentUpdateDTO endTime);
 
     @PostMapping("/{id}/end")

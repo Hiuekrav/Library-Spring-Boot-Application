@@ -561,7 +561,7 @@ class RentControllerTests {
                 .contentType(ContentType.JSON)
             .when()
                 .body(updateDTO)
-                .post("/api/rents/{id}", rent.getId());
+                .put("/api/rents/{id}", rent.getId());
 
         if (response.getStatusCode() != 200) {
             response.then().log().all();

@@ -132,7 +132,7 @@ public class UserRepository extends ObjectRepository<UserMgd> implements IUserRe
     public List<UserMgd> findByEmail(String email) {
         MongoCollection<UserMgd> userCollection = super.getDatabase().getCollection(DatabaseConstants.USER_COLLECTION_NAME,
                 getMgdClass());
-        Bson emailFilter = Filters.regex(DatabaseConstants.USER_EMAIL, ".*" + email + ".*", "i");
+        Bson emailFilter = Filters.regex(DatabaseConstants.USER_EMAIL,  email + ".*", "i");
         return userCollection.find(emailFilter).into(new ArrayList<>());
     }
 

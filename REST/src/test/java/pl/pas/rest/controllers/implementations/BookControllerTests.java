@@ -202,7 +202,7 @@ public class BookControllerTests {
                 .contentType(ContentType.JSON)
                 .body(updateDTO)
             .when()
-                .post("/api/books/{id}", createdBook.getId());
+                .put("/api/books/{id}", createdBook.getId());
 
         if (response.getStatusCode() != 200) {
             response.then().log().all();

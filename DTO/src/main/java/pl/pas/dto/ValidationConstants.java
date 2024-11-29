@@ -34,7 +34,7 @@ public class ValidationConstants {
     public static final int BOOK_TITLE_MAX_LENGTH = 64;
     public static final String BOOK_TITLE_TOO_SHORT = "title.too.short";
     public static final String BOOK_TITLE_TOO_LONG = "title.too.long";
-    public static final int BOOK_PAGES_MIN_VALUE = 0;
+    public static final int BOOK_PAGES_MIN_VALUE = 1;
 
     public static final String TITLE_BLANK = "book.title.blank";
     public static final String AUTHOR_BLANK = "book.author.blank";
@@ -43,4 +43,5 @@ public class ValidationConstants {
     public static final String PUBLISHED_DATE_BLANK = "book.published.date.blank";
 
     public static final String RENT_ID_BLANK = "rent.id.blank";
+    public static final String BOOK_PAGES_TOO_LOW = "book.pages.too.low";
 }

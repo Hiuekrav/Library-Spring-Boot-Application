@@ -22,7 +22,7 @@ public interface IBookController {
     @GetMapping("")
     ResponseEntity<?> findByTitle(@RequestParam("title") String title);
 
-    @PostMapping(path = "{id}",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "{id}",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> updateBook(@PathVariable("id") UUID id, @Valid @RequestBody BookUpdateDTO bookUpdateDTO);
 
     @DeleteMapping("{id}")

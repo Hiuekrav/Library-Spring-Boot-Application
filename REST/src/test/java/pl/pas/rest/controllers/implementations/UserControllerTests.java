@@ -190,7 +190,7 @@ class UserControllerTests {
                 .contentType(ContentType.JSON)
                 .body(updatedDTO)
             .when()
-                .post("/api/users/{id}", createdLibrarian.getId())
+                .put("/api/users/{id}", createdLibrarian.getId())
             .then()
                 //.statusCode(200)
                 .body("email", equalTo(updatedDTO.email())).log().all();

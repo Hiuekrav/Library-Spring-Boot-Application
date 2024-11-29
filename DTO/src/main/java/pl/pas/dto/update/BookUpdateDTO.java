@@ -22,7 +22,7 @@ public record BookUpdateDTO(
         String title,
 
         String author,
-        @Min(ValidationConstants.BOOK_PAGES_MIN_VALUE)
+        @Min(value = ValidationConstants.BOOK_PAGES_MIN_VALUE, message = ValidationConstants.BOOK_PAGES_TOO_LOW)
         Integer numberOfPages,
         Genre genre,
         LocalDate publishedDate

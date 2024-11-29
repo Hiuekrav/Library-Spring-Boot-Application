@@ -31,7 +31,7 @@ public interface IUserController {
     @GetMapping(value = "all", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> findAll();
 
-    @PostMapping(value = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> updateUser(@PathVariable("id") UUID id, @Valid @RequestBody UserUpdateDTO userUpdateDTO);
 
     @PostMapping(value = "{id}/activate")

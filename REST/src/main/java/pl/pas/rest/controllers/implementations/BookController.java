@@ -25,8 +25,6 @@ public class BookController implements IBookController {
 
     private String bookURI = "/books/%s";
 
-
-
     @Override
     public ResponseEntity<?> createBook(BookCreateDTO bookCreateDTO) {
         Book book = bookService.createBook(bookCreateDTO);
