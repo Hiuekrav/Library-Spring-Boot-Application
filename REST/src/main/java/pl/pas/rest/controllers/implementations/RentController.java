@@ -43,9 +43,7 @@ public class RentController implements IRentController {
     // By Rent
     public ResponseEntity<?> findAllRents() {
         List<Rent> rents = rentService.findAll();
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO));
     }
 
@@ -64,66 +62,50 @@ public class RentController implements IRentController {
     // By Reader
     public ResponseEntity<?> findAllByReaderId(UUID readerId) {
         List<Rent> rents = rentService.findAllByReaderId(readerId);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO));
     }
 
     @Override
     public ResponseEntity<?> findAllFutureByReaderId(UUID readerId) {
         List<Rent> rents = rentService.findAllFutureByReaderId(readerId);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO).toList());
     }
 
     @Override
     public ResponseEntity<?> findAllActiveByReaderId(UUID readerId) {
         List<Rent> rents = rentService.findAllActiveByReaderId(readerId);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok((rents.stream().map(RentMapper::toRentOutputDTO).toList()));
     }
 
     @Override
     public ResponseEntity<?> findAllArchivedByReaderId(UUID readerId) {
         List<Rent> rents = rentService.findAllArchivedByReaderId(readerId);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO).toList());
     }
-
-
 
     // By Book
     @Override
     public ResponseEntity<?> findAllByBookId(UUID readerId) {
         List<Rent> rents = rentService.findAllByBookId(readerId);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO));
     }
 
     @Override
     public ResponseEntity<?> findAllFutureByBookId(UUID bookId) {
         List<Rent> rents = rentService.findAllFutureByBookId(bookId);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO).toList());
     }
 
     @Override
     public ResponseEntity<?> findAllActiveByBookId(UUID bookId) {
         List<Rent> rents = rentService.findAllActiveByBookId(bookId);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (rents.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(rents.stream().map(RentMapper::toRentOutputDTO).toList());
     }
 

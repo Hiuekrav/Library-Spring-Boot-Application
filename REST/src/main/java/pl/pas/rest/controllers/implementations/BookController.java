@@ -2,19 +2,15 @@ package pl.pas.rest.controllers.implementations;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pas.dto.create.BookCreateDTO;
 import pl.pas.dto.output.BookOutputDTO;
-import pl.pas.dto.output.ExceptionOutputDTO;
 import pl.pas.dto.update.BookUpdateDTO;
 import pl.pas.rest.controllers.interfaces.IBookController;
 import pl.pas.rest.exceptions.book.BookNotFoundException;
 import pl.pas.rest.model.Book;
 import pl.pas.rest.services.interfaces.IBookService;
-import pl.pas.rest.utils.consts.DatabaseConstants;
-import pl.pas.rest.utils.consts.I18n;
 import pl.pas.rest.utils.mappers.BookMapper;
 
 import java.net.URI;
@@ -53,6 +49,13 @@ public class BookController implements IBookController {
     @Override
     public ResponseEntity<?> findByTitle(String title) {
         List<Book> foundBooks = bookService.findBookByTitle(title);
+        if (foundBooks.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().body(foundBooks.stream().map(BookMapper::toBookOutputDTO));
+    }
+
+    @Override
+    public ResponseEntity<?> findAll() {
+        List<Book> foundBooks = bookService.findAll();
         if (foundBooks.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().body(foundBooks.stream().map(BookMapper::toBookOutputDTO));
     }
