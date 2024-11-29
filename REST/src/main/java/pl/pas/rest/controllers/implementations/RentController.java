@@ -8,6 +8,7 @@ import pl.pas.dto.create.RentCreateShortDTO;
 import pl.pas.dto.output.RentOutputDTO;
 import pl.pas.dto.update.RentUpdateDTO;
 import pl.pas.rest.controllers.interfaces.IRentController;
+import pl.pas.rest.exceptions.rent.RentNotFoundException;
 import pl.pas.rest.model.Rent;
 import pl.pas.rest.services.interfaces.IRentService;
 import pl.pas.rest.utils.mappers.RentMapper;
@@ -49,8 +50,13 @@ public class RentController implements IRentController {
     }
 
     public ResponseEntity<?> findById(UUID id) {
-        Rent rents = rentService.findRentById(id);
-        return ResponseEntity.ok(RentMapper.toRentOutputDTO(rents));
+        Rent rent;
+        try {
+            rent = rentService.findRentById(id);
+        } catch (RentNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(RentMapper.toRentOutputDTO(rent));
     }
 
 

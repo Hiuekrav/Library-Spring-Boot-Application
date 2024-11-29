@@ -12,13 +12,7 @@ import pl.pas.rest.exceptions.rent.*;
 @ControllerAdvice
 public class RentExceptionResolver {
 
-    @ExceptionHandler(value = {RentNotFoundException.class})
-    public ResponseEntity<?> handleRentNotFoundException(RentNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ExceptionOutputDTO(e.getMessage()));
-    }
-
-    @ExceptionHandler(value = {RentCreationException.class,
+    @ExceptionHandler(value = {RentCreationException.class, RentNotFoundException.class,
     RentInvalidTimeException.class, RentDeleteException.class})
     public ResponseEntity<?> handleRentGeneralExceptions(RentBaseException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

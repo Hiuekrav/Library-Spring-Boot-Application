@@ -12,12 +12,8 @@ import pl.pas.rest.exceptions.user.*;
 @ControllerAdvice
 public class UserExceptionResolver {
 
-    @ExceptionHandler(value = {UserNotFoundException.class})
-    public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionOutputDTO(e.getMessage()));
-    }
-
-    @ExceptionHandler(value = {UserDeactivateException.class, UserNotActiveException.class})
+    @ExceptionHandler(value = {UserNotFoundException.class,
+            UserDeactivateException.class, UserNotActiveException.class})
     public ResponseEntity<?> handleUserDeactivateException(UserBaseException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionOutputDTO(e.getMessage()));
     }

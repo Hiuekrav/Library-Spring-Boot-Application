@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  mongo_1:
+    build: .\custommongo
+    container_name: mongodb1
+    hostname: mongodb1
+    networks:
+      - mongonet
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=rentacar
+    command: --config /etc/mongod.conf --port 27017
+    healthcheck:
+      test: ["CMD", "mongosh", "--port" , "27017", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+
+  mongo_2:
+    build: .\custommongo
+    container_name: mongodb2
+    hostname: mongodb2
+    ports:
+      - "27018:27018"
+    networks:
+      - mongonet
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=rentacar
+    command: --config /etc/mongod.conf --port 27018
+    healthcheck:
+      test: ["CMD", "mongosh", "--port" , "27018", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+
+  mongo_3:
+    build: .\custommongo
+    container_name: mongodb3
+    hostname: mongodb3
+    ports:
+      - "27019:27019"
+    networks:
+      - mongonet
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=rentacar
+    command: --config /etc/mongod.conf --port 27019
+    healthcheck:
+      test: ["CMD", "mongosh", "--port" , "27019", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+
+  mongoinit:
+    build: .\custommongo
+    container_name: mongodbinit
+    hostname: mongodbinit
+    networks:
+      - mongonet
+    depends_on:
+      mongo_1:
+        condition: service_healthy
+      mongo_2:
+        condition: service_healthy
+      mongo_3:
+        condition: service_healthy
+
+    command: >
+      mongosh --host mongodb1:27017 --username admin --password adminpassword --authenticationDatabase admin --eval
+      '
+      rs.initiate(
+        {
+          _id: "replica_set_three_nodes",
+          version: 1,
+          members: [
+            { _id:0, host : "mongodb1:27017" },
+            { _id:1, host : "mongodb2:27018" },
+            { _id:2, host : "mongodb3:27019" }
+          ]
+        }
+      );
+      '
+networks:
+  mongonet: {}
+
+

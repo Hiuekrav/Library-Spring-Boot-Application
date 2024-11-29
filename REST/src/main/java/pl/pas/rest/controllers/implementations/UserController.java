@@ -61,6 +61,7 @@ public class UserController implements IUserController {
     public ResponseEntity<?> findByEmail(String email) {
         List<User> user = userService.findByEmail(email);
         List<UserOutputDTO> outputDTOList = user.stream().map(UserMapper::toUserOutputDTO).toList();
+        if (outputDTOList.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok().body(outputDTOList);
     }
 
